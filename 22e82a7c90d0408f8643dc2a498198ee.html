@@ -1,0 +1,2354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GANHA MAIS 💰 | MODO PRO</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<style>
+:root{
+--azul:#0ea5e9;--azul-esc:#0284c7;--azul-esc2:#0369a1;
+--roxo:#7c3aed;--roxo-esc:#5b21b6;
+--verde:#10b981;--verde-esc:#059669;
+--laranja:#f59e0b;--laranja-esc:#d97706;
+--vermelho:#ef4444;--vermelho-esc:#dc2626;
+--bg1:#f0f9ff;--bg2:#e0f2fe;--bg3:#ddd6fe;
+--sombra:0 6px 24px rgba(14,165,233,0.15);
+--sombra2:0 3px 12px rgba(0,0,0,0.08);
+--rd:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Fredoka',sans-serif;-webkit-tap-highlight-color:transparent;}
+.esconder{display:none!important}
+.sumir-rolagem{position:fixed;left:0;right:0;transition:transform .3s ease,opacity .3s ease;z-index:998}
+.sumir-rolagem.escondido-menu{transform:translateY(100%);opacity:0}
+
+body{background:linear-gradient(160deg,#f0f9ff 0%,#e0f2fe 40%,#ddd6fe 100%);min-height:100vh;padding-bottom:110px;}
+
+.bolha{position:fixed;bottom:115px;right:15px;width:58px;height:58px;border-radius:50%;background:linear-gradient(145deg,#7c3aed,#5b21b6);display:flex;align-items:center;justify-content:center;text-decoration:none;box-shadow:0 6px 20px rgba(124,58,237,.4);border:3px solid #fff;z-index:999;}
+.bolha:active{transform:scale(0.95);}
+
+.online-indicador{display:inline-block;width:10px;height:10px;border-radius:50%;background:#9ca3af;margin-right:6px}
+.online-indicador.ativo{background:#10b981;box-shadow:0 0 6px #10b981}
+
+.admin-topo{position:fixed;top:12px;right:12px;z-index:997;display:none}
+.admin-topo.mostrar{display:block}
+.btn-admin{background:linear-gradient(135deg,rgba(255,255,255,0.95),rgba(255,255,255,0.85));border:none;color:#7c3aed;font-size:22px;width:42px;height:42px;border-radius:50%;cursor:pointer;box-shadow:var(--sombra2);display:flex;align-items:center;justify-content:center;font-weight:700;}
+.menu-admin{position:absolute;top:50px;right:0;background:#fff;border-radius:16px;box-shadow:var(--sombra);min-width:260px;padding:8px 0;display:none}
+.menu-admin.aberto{display:block}
+.item-admin{padding:12px 18px;cursor:pointer;font-weight:600;color:#374151;font-size:14px}
+.item-admin:hover{background:#f0f9ff;color:#0284c7}
+.item-admin.voltar{color:#7c3aed;border-top:1px solid #f3f4f6;margin-top:4px;padding-top:12px;}
+.item-admin.voltar:hover{background:#ede9fe;color:#5b21b6;}
+
+.topo{background:linear-gradient(135deg,#0ea5e9 0%,#7c3aed 100%);color:#fff;padding:22px 15px 20px;border-radius:0 0 28px 28px;text-align:center;box-shadow:0 6px 24px rgba(14,165,233,0.25);}
+.topo h1{font-size:24px;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,0.2);}
+.topo p{font-size:13px;opacity:.95;margin-top:6px;font-weight:500;}
+
+.verde{background:linear-gradient(135deg,#ffffff 0%,#e0f2fe 100%);border-radius:var(--rd);padding:20px;margin:12px;text-align:center;border:2px solid #bae6fd;box-shadow:var(--sombra2);}
+.saldo-grande{font-size:26px;font-weight:700;color:#0369a1}
+.valor-real{font-size:16px;color:#0284c7;margin-top:6px;font-weight:600}
+
+.branco{background:#fff;border-radius:var(--rd);padding:22px;margin:12px;box-shadow:var(--sombra2);border:1px solid rgba(14,165,233,0.1);}
+
+.ouro-bloco{background:linear-gradient(135deg,#fffbeb 0%,#fef3c7 50%,#fde68a 100%);border:3px solid #f59e0b;border-radius:var(--rd);padding:20px;margin:12px;box-shadow:0 4px 15px rgba(245,158,11,0.15);}
+.ouro-bloco h3{text-align:center;color:#92400e;font-size:18px;margin-bottom:12px;text-transform:uppercase;font-weight:700;}
+.regra{background:rgba(255,255,255,.9);border-radius:12px;padding:14px;margin:10px 0;color:#78350f;line-height:1.6;font-weight:500;}
+.link-caixa{background:linear-gradient(90deg,#e0f2fe,#bae6fd);border-radius:12px;padding:14px;margin:12px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.link-caixa span{flex:1;font-size:11px;color:#0369a1;word-break:break-all;font-weight:500;}
+.btn-copiar{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;border:none;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;white-space:nowrap;font-size:13px;}
+.btn-copiar:active{transform:scale(0.97);}
+
+.contagem{display:flex;justify-content:space-around;margin-top:15px;gap:8px;}
+.contagem div{background:#fff;border-radius:12px;padding:12px 6px;text-align:center;min-width:70px;flex:1;box-shadow:var(--sombra2);border:1px solid #bae6fd;}
+.contagem strong{font-size:22px;color:#d97706;display:block;font-weight:700;}
+.contagem span{font-size:11px;color:#78350f;font-weight:600;}
+
+/* CARDS DE TAREFAS */
+.tarefa{background:#fff;border-radius:16px;padding:14px;margin:12px;box-shadow:0 2px 12px rgba(0,0,0,0.08);border:1px solid #e5e7eb;transition:all .2s;}
+.tarefa:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.1);}
+.tarefa-cabecalho{display:flex;gap:12px;margin-bottom:10px;}
+.tarefa-foto-card{width:70px;height:70px;border-radius:12px;object-fit:cover;flex-shrink:0;border:2px solid #e0f2fe;background:#f0f9ff;}
+.tarefa-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;}
+.tarefa-info h4{font-size:16px;font-weight:700;color:#1f2937;margin-bottom:6px;}
+.tarefa-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:4px;}
+.tarefa-nivel{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.nivel-facil{background:#d1fae5;color:#065f46;}
+.nivel-medio{background:#fef3c7;color:#92400e;}
+.nivel-dificil{background:#fee2e2;color:#991b1b;}
+.tarefa-pontos{color:#7c3aed;font-weight:700;font-size:13px;}
+.tarefa-valor{color:#059669;font-weight:600;font-size:12px;}
+.tarefa-descricao-curta{font-size:12px;color:#6b7280;line-height:1.4;margin-top:2px;}
+
+.btn-tarefa-principal{width:100%;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:0.3px;margin-top:8px;}
+.btn-fazer{background:linear-gradient(135deg,#10b981,#059669);color:#fff;box-shadow:0 3px 10px rgba(16,185,129,0.3);}
+.btn-aguarde{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;cursor:not-allowed;box-shadow:0 3px 10px rgba(245,158,11,0.3);}
+.btn-aprovada{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;cursor:not-allowed;box-shadow:0 3px 10px rgba(14,165,233,0.3);}
+.btn-rejeitada{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;cursor:not-allowed;box-shadow:0 3px 10px rgba(239,68,68,0.3);}
+
+.pendente{background:#fef3c7;color:#92400e;padding:12px;border-radius:12px;margin:12px 0;text-align:center;font-weight:700;font-size:14px;border:2px solid #fcd34d;}
+.aprovado{background:#d1fae5;color:#065f46;padding:12px;border-radius:12px;margin:12px 0;text-align:center;font-weight:700;font-size:14px;border:2px solid #6ee7b7;}
+.rejeitado{background:#fee2e2;color:#991b1b;padding:12px;border-radius:12px;margin:12px 0;text-align:center;font-weight:700;font-size:14px;border:2px solid #fca5a5;}
+
+label{display:block;font-weight:600;margin:15px 0 5px;color:#374151;text-transform:uppercase;font-size:12px;letter-spacing:0.3px;}
+input, textarea, select{width:100%;padding:13px;border:2px solid #e5e7eb;border-radius:12px;font-size:15px;margin-bottom:5px;background:#fafafa;transition:border-color .2s,background .2s;}
+textarea{min-height:100px;resize:vertical;font-family:inherit;}
+select{cursor:pointer;}
+input:focus, textarea:focus, select:focus{border-color:#7c3aed;outline:none;background:#fff;}
+
+.principal{width:100%;padding:15px;background:linear-gradient(135deg,#0ea5e9,#7c3aed);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin:15px 0;text-transform:uppercase;box-shadow:0 4px 15px rgba(124,58,237,0.3);letter-spacing:0.5px;transition:all .2s;}
+.principal:active{transform:scale(0.98);}
+.principal:disabled{opacity:.6;cursor:not-allowed;}
+
+.msg-erro{background:#fee2e2;color:#b91c1c;padding:12px;border-radius:10px;margin:10px 0;display:none;font-weight:600;font-size:14px;border:1px solid #fecaca;}
+.msg-ok{background:#d1fae5;color:#065f46;padding:12px;border-radius:10px;margin:10px 0;display:none;font-weight:600;font-size:14px;border:1px solid #a7f3d0;}
+.msg-info{background:#e0f2fe;color:#0369a1;padding:12px;border-radius:10px;margin:10px 0;display:none;font-weight:600;font-size:14px;border:1px solid #bae6fd;}
+.mostrar{display:block!important;}
+
+.menu-baixo{bottom:0;left:0;right:0;display:flex;gap:4px;background:#fff;padding:10px 6px 32px 6px;box-shadow:0 -4px 18px rgba(0,0,0,0.1);border-top:1px solid #e5e7eb;position:fixed;z-index:998;}
+.menu-baixo button{flex:1;border:none;background:transparent;padding:12px 4px;border-radius:12px;cursor:pointer;font-size:12px;font-weight:600;color:#6b7280;transition:all .2s;}
+.menu-baixo button.ativo{background:linear-gradient(135deg,#e0f2fe,#ddd6fe);color:#7c3aed;box-shadow:var(--sombra2);}
+
+.chave-btn{width:100%;padding:13px;border:2px solid #e5e7eb;background:#fafafa;border-radius:12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin:8px 0;font-weight:500;color:#374151;}
+.chaves-opcoes{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-height:0;overflow:hidden;opacity:0;transition:.3s}
+.chaves-opcoes.mostrar{max-height:200px;opacity:1;margin-bottom:10px}
+.btn-chave{padding:10px;border:2px solid #e5e7eb;background:#fff;border-radius:10px;cursor:pointer;font-weight:600;color:#374151;font-size:13px;}
+.btn-chave.ativo{border-color:#0ea5e9;background:#e0f2fe;color:#0369a1;}
+
+.sem-dados{text-align:center;padding:30px;color:#6b7280;font-weight:500;font-size:14px;}
+.item-lista{border:2px solid #e5e7eb;border-radius:14px;padding:15px;margin:10px 0;background:#fff;box-shadow:var(--sombra2);transition:all .2s;display:block !important;clear:both !important;float:none !important;width:100% !important;}
+.item-lista:hover{border-color:#7c3aed;}
+.senha-caixa{position:relative}
+.olho{position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:20px;user-select:none;color:#6b7280;}
+
+.btn{padding:12px;border:none;border-radius:10px;font-weight:600;cursor:pointer;margin:5px 0;width:100%;font-size:14px;transition:all .2s;}
+.btn:active{transform:scale(0.98);}
+.btn:disabled{opacity:.6;cursor:not-allowed;}
+.btn-v{background:linear-gradient(135deg,#10b981,#059669);color:#fff;box-shadow:0 3px 10px rgba(16,185,129,0.25);}
+.btn-x{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;box-shadow:0 3px 10px rgba(239,68,68,0.25);}
+.btn-admin-toggle{background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;box-shadow:0 3px 10px rgba(124,58,237,0.25);}
+.btn-excluir{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;padding:12px;border:none;border-radius:10px;font-weight:700;cursor:pointer;margin-top:8px;font-size:14px;width:100%;box-shadow:0 3px 10px rgba(239,68,68,0.25);}
+.btn-editar{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;padding:12px;border:none;border-radius:10px;font-weight:700;cursor:pointer;margin-top:8px;font-size:14px;width:100%;box-shadow:0 3px 10px rgba(14,165,233,0.25);margin-right:8px;}
+.botoes-duplos{display:flex;gap:8px;}
+.botoes-duplos button{flex:1;}
+
+.dono-tag{display:inline-block;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-left:6px;}
+
+hr{margin:25px 0 18px;border:none;border-top:2px dashed #e0f2fe;}
+.foto-prova{max-width:100%;border-radius:10px;margin:10px 0;border:2px solid #bae6fd;}
+.dados-prova{margin:6px 0;font-size:13px;color:#4b5563;font-weight:500;}
+.hora-prova{font-size:11px;color:#9ca3af;margin-top:4px;font-weight:500;}
+
+.painel-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.painel-card{background:linear-gradient(135deg,#fff,#f0f9ff);border-radius:14px;padding:14px;text-align:center;box-shadow:var(--sombra2);border:1px solid #bae6fd;}
+.painel-card .numero{font-size:24px;font-weight:700;color:#0284c7}
+.painel-card .rotulo{font-size:11px;color:#6b7280;margin-top:4px;font-weight:600;}
+
+.abas{display:flex;background:#e5e7eb;border-radius:14px;padding:5px;margin-bottom:20px;}
+.abas button{flex:1;padding:12px;border:none;background:transparent;border-radius:10px;font-weight:600;color:#6b7280;cursor:pointer;font-size:14px;transition:all .2s;}
+.abas button.ativa{background:#fff;color:#7c3aed;box-shadow:var(--sombra2);}
+/* ===== ABAS: TAREFAS / MINHAS TAREFAS (entre convite e lista) ===== */
+.abas-tarefas{display:flex;gap:8px;margin:0 12px 12px;background:#e5e7eb;border-radius:14px;padding:5px;}
+.aba-tarefa{flex:1;padding:12px 6px;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;background:transparent;color:#6b7280;transition:all .2s;}
+.aba-tarefa.ativa{background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;box-shadow:0 3px 10px rgba(124,58,237,.35);}
+.hist-info{margin:0 12px 10px;background:linear-gradient(135deg,#ede9fe,#ddd6fe);border:1px solid #c4b5fd;border-radius:12px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;}
+.hist-info span{font-size:12px;color:#5b21b6;font-weight:700;}
+.hist-info strong{font-size:18px;color:#5b21b6;font-weight:700;}
+.hist-card{background:#fff;border-radius:14px;padding:14px;margin:10px 12px;box-shadow:0 2px 12px rgba(0,0,0,.08);border:1px solid #e5e7eb;}
+.hist-topo{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px;}
+.hist-nome{font-weight:700;color:#1f2937;font-size:15px;flex:1;}
+.status-badge{padding:4px 10px;border-radius:20px;font-size:10.5px;font-weight:700;white-space:nowrap;text-transform:uppercase;letter-spacing:.3px;}
+.status-pendente{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;}
+.status-aprovado{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;}
+.status-rejeitado{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}
+.hist-data{font-size:12px;color:#9ca3af;font-weight:600;margin-top:2px;}
+.hist-pts{margin-top:8px;background:#d1fae5;color:#065f46;padding:8px 12px;border-radius:10px;font-weight:700;font-size:13px;border:1px solid #6ee7b7;}
+.hist-motivo{margin-top:8px;background:#fee2e2;color:#991b1b;padding:8px 12px;border-radius:10px;font-weight:600;font-size:12.5px;border:1px solid #fca5a5;line-height:1.4;}
+
+/* MODAL */
+.modal-fundo{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;padding:1rem;display:none;}
+.modal-caixa{background:#fff;border-radius:20px;max-width:420px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:subir .3s ease;}
+@keyframes subir{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.modal-cabecalho{display:flex;align-items:center;gap:14px;padding:1.2rem;border-bottom:1px solid #f3f4f6;}
+.modal-icone{width:52px;height:52px;border-radius:14px;object-fit:cover;flex-shrink:0;border:2px solid #e0f2fe;background:#f0f9ff;}
+.modal-titulo{flex:1;}
+.modal-titulo h3{font-size:1.1rem;font-weight:700;color:#1f2937;margin-bottom:4px;}
+.modal-titulo p{font-size:.8rem;color:#6b7280;}
+
+.modal-recompensa{display:flex;justify-content:space-around;background:linear-gradient(90deg,#ecfdf5,#d1fae5);margin:1rem;padding:1rem;border-radius:14px;}
+.modal-recompensa-item{text-align:center;}
+.modal-recompensa-valor{font-size:1.3rem;font-weight:700;color:#059669;}
+.modal-recompensa-label{font-size:.72rem;color:#047857;font-weight:600;margin-top:2px;}
+
+.modal-conteudo{padding:0 1rem 1rem;}
+
+.caixa-regras{background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:14px;padding:1rem;margin-bottom:1rem;}
+.caixa-regras h4{color:#065f46;margin-bottom:.8rem;font-size:.95rem;display:flex;align-items:center;gap:6px;}
+.item-regra{display:flex;gap:.6rem;margin:.5rem 0;font-size:.88rem;color:#374151;line-height:1.5;}
+.item-regra span:first-child{color:#10b981;font-weight:700;flex-shrink:0;}
+.item-regra span:last-child{word-break:break-word;overflow-wrap:anywhere;min-width:0;}
+.caixa-regras{overflow:hidden;}
+.regra{word-break:break-word;overflow-wrap:anywhere;}
+
+.caixa-comprovante{background:#f9fafb;border:1px solid #e5e7eb;border-radius:14px;padding:1rem;margin-bottom:1rem;}
+.caixa-comprovante h4{color:#374151;margin-bottom:.8rem;font-size:.95rem;display:flex;align-items:center;gap:6px;}
+.exemplo-imagem{width:100%;max-width:280px;border-radius:10px;border:2px solid #e5e7eb;max-height:200px;object-fit:contain;background:#fff;margin:0 auto .8rem auto;display:block;}
+.texto-exemplo{font-size:.8rem;color:#6b7280;text-align:center;margin-bottom:1rem;}
+
+.envio-usuario{background:rgba(14,165,233,0.05);border:2px dashed #0ea5e9;border-radius:12px;padding:1rem;margin-top:1rem;}
+.envio-usuario label{font-weight:700;color:#0369a1;margin-bottom:8px;display:block;font-size:13px;text-transform:none;letter-spacing:0;}
+.envio-usuario input[type="file"]{width:100%;padding:10px;background:#fff;border:2px solid #bae6fd;border-radius:10px;font-size:13px;cursor:pointer;}
+.envio-usuario img{max-width:100%;border-radius:10px;margin:10px 0;border:2px solid #10b981;max-height:180px;object-fit:contain;display:block;margin-left:auto;margin-right:auto;}
+
+.modal-botoes{display:flex;flex-direction:column;gap:8px;margin-top:1rem;}
+.botao-modal{width:100%;padding:1rem;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:0.3px;}
+.botao-fazer{background:linear-gradient(135deg,#10b981,#059669);color:#fff;box-shadow:0 3px 10px rgba(16,185,129,0.3);}
+.botao-comprovante{background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;box-shadow:0 3px 10px rgba(14,165,233,0.3);}
+.botao-modal:active{transform:scale(0.98);}
+.botao-cancelar{width:100%;padding:.7rem;border:none;border-radius:12px;background:transparent;color:#6b728b;cursor:pointer;font-weight:600;font-size:.9rem;margin-top:4px;}
+
+/* MODO PRO - ESTILOS ESPECIAIS */
+.admin-verificado{background:linear-gradient(135deg,#d1fae5,#a7f3d0);border:2px solid #10b981;border-radius:12px;padding:12px;margin:10px 0;color:#065f46;font-weight:700;font-size:13px;text-align:center;box-shadow:0 2px 8px rgba(16,185,129,0.2);}
+.admin-negado{background:linear-gradient(135deg,#fee2e2,#fecaca);border:2px solid #ef4444;border-radius:12px;padding:12px;margin:10px 0;color:#991b1b;font-weight:700;font-size:13px;text-align:center;box-shadow:0 2px 8px rgba(239,68,68,0.2);}
+.aviso-edicao{background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b;border-radius:12px;padding:12px;margin:10px 0;color:#92400e;font-weight:700;font-size:13px;text-align:center;}
+.loading{display:inline-block;width:16px;height:16px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;margin-right:8px;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.preview-foto{max-width:120px;max-height:120px;border-radius:12px;border:3px solid #7c3aed;margin:10px auto;display:block;object-fit:cover;box-shadow:var(--sombra2);}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);padding:14px 24px;border-radius:12px;font-weight:700;color:#fff;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.2);transition:transform .3s ease;opacity:0;}
+.toast.mostrar{transform:translateX(-50%) translateY(0);opacity:1;}
+.toast.sucesso{background:linear-gradient(135deg,#10b981,#059669);}
+.toast.erro{background:linear-gradient(135deg,#ef4444,#dc2626);}
+.toast.info{background:linear-gradient(135deg,#0ea5e9,#0284c7);}
+
+/* ===== NOTIFICACAO REAL DE SAQUE (4s + arrasta pra sumir) + ONLINE ===== */
+.ns-box{position:fixed;top:14px;right:14px;z-index:99990;display:flex;flex-direction:column;gap:8px;width:300px;max-width:82%;pointer-events:none;}
+.ns-item{pointer-events:auto;display:flex;gap:10px;align-items:center;background:rgba(15,18,32,.95);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-left:3px solid #10b981;border-radius:12px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.45);font-family:'Fredoka',sans-serif;animation:nsIn .35s cubic-bezier(.2,.9,.3,1.2) both;touch-action:pan-y;cursor:grab;}
+.ns-item:active{cursor:grabbing;}
+.ns-item.ns-saindo{transition:opacity .25s,transform .25s;opacity:0;}
+.ns-ico{width:32px;height:32px;border-radius:50%;background:rgba(16,185,129,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#10b981;font-weight:700;font-size:15px;}
+.ns-texto{flex:1;min-width:0;font-size:13px;color:#eee;line-height:1.35;}
+.ns-texto b{color:#fff;}
+.ns-valor{color:#10b981;font-weight:700;}
+.ns-sub{font-size:11px;color:#94a3b8;margin-top:2px;}
+.ns-fechar{background:none;border:none;color:#94a3b8;font-size:18px;cursor:pointer;padding:0 4px;line-height:1;flex-shrink:0;}
+@keyframes nsIn{from{opacity:0;transform:translateX(24px) scale(.96);}to{opacity:1;transform:none;}}
+/* ===== PESSOAS ONLINE - pill escura SEMPRE visivel no canto sup. esquerdo (em cima do header) ===== */
+.online-badge{position:fixed;top:10px;left:10px;z-index:998;display:flex;align-items:center;gap:7px;background:rgba(15,18,32,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:6px 12px 6px 8px;font-family:'Fredoka',sans-serif;font-size:12.5px;color:#eee;box-shadow:0 4px 14px rgba(0,0,0,.35);}
+.online-badge .pessoa{width:22px;height:22px;border-radius:50%;background:rgba(16,185,129,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.online-badge .dot{width:7px;height:7px;border-radius:50%;background:#10b981;flex-shrink:0;animation:odPulse 1.6s infinite;}
+@keyframes odPulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+#onlineCount{color:#10b981;font-weight:700;}
+/* ===== NOTIFICACAO DE SAQUE - na faixa entre o saldo e o "Convide e Ganhe" (espaco marcado) ===== */
+.saque-notif-area{margin:0 12px;display:none;}
+.saque-notif-area.visivel{display:block;animation:notifEntrar .45s cubic-bezier(.2,.9,.3,1.3) both;}
+.saque-notif-banner{display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border-radius:14px;padding:11px 16px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(239,68,68,.4);border:2px solid #fff;text-align:center;user-select:none;}
+.saque-notif-banner:active{transform:scale(.97);}
+.saque-notif-banner .sino{display:inline-block;animation:sinoBalanco 1s ease-in-out infinite;transform-origin:top center;}
+.saque-notif-banner .num{background:#fff;color:#dc2626;border-radius:999px;padding:1px 9px;font-size:13px;font-weight:700;min-width:24px;text-align:center;}
+@keyframes notifEntrar{from{opacity:0;transform:translateY(-8px) scale(.92);}60%{transform:translateY(2px) scale(1.03);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes sinoBalanco{0%,100%{transform:rotate(0);}20%{transform:rotate(14deg);}40%{transform:rotate(-10deg);}60%{transform:rotate(6deg);}80%{transform:rotate(-3deg);}}
+@media(max-width:480px){.ns-box{width:240px;top:10px;right:10px;}.ns-texto{font-size:12px;}.online-badge{top:8px;left:8px;font-size:11.5px;padding:5px 10px 5px 6px;}.saque-notif-banner{font-size:13px;padding:10px 12px;}}
+</style>
+</head>
+<body>
+<div class="ns-box" id="nsBox"></div>
+<div class="online-badge" id="onlineBadge"><span class="pessoa"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.4"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span class="dot"></span><span id="onlineCount">0</span> online</div>
+
+
+<!-- TOAST DE NOTIFICAÇÃO -->
+<div id="toast" class="toast"></div>
+
+<a href="https://t.me/ganhamaisoficial12" target="_blank" class="bolha" id="bolhaSup" title="Suporte">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+</svg>
+</a>
+
+<div class="admin-topo" id="adminTopo">
+<button class="btn-admin" onclick="toggleMenuAdmin()">⋮</button>
+<div class="menu-admin" id="menuAdmin">
+<div class="item-admin" onclick="ir('painel')">📊 PAINEL GERAL</div>
+<div class="item-admin" onclick="ir('pessoas')">👥 USUÁRIOS</div>
+<div class="item-admin" onclick="ir('busca')">🔍 BUSCAR / PONTOS</div>
+<div class="item-admin" onclick="ir('editor')">✏️ CADASTRAR TAREFA</div>
+<div class="item-admin" onclick="ir('editor-modal')">🎯 DETALHES MODAL</div>
+<div class="item-admin" onclick="ir('analise')">📥 APROVAR PROVAS</div>
+<div class="item-admin" onclick="ir('saques-admin')">💸 LIBERAR SAQUES</div>
+<div class="item-admin voltar" onclick="voltarParaInicio()">🏠 VOLTAR PARA INÍCIO</div>
+</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-fundo" id="modalTarefa">
+<div class="modal-caixa">
+<div class="modal-cabecalho">
+<img class="modal-icone" id="modalIcone" src="" alt="ícone" onerror="this.style.display='none'">
+<div class="modal-titulo">
+<h3 id="modalTitulo">Nome da Tarefa</h3>
+<p id="modalNivel">Nível: Fácil</p>
+</div>
+</div>
+<div class="modal-recompensa">
+<div class="modal-recompensa-item"><div class="modal-recompensa-valor" id="modalPontos">0</div><div class="modal-recompensa-label">PONTOS</div></div>
+<div class="modal-recompensa-item"><div class="modal-recompensa-valor" id="modalValor">R$ 0,00</div><div class="modal-recompensa-label">RECOMPENSA</div></div>
+</div>
+<div class="modal-conteudo">
+<div class="caixa-regras"><h4>📋 Regras da tarefa</h4><div id="modalRegras"></div></div>
+<div class="caixa-comprovante">
+<h4>📎 COMPROVANTE:</h4>
+<p class="texto-exemplo">Exemplo de como deve ficar seu print:</p>
+<img class="exemplo-imagem" id="modalExemplo" src="" alt="exemplo" onerror="this.style.display='none'">
+<div class="envio-usuario">
+<label>📷 Envie seu comprovante:</label>
+<input type="file" id="fotoComprovanteModal" accept="image/*" onchange="previsualizarModal()">
+<img id="prevModal" style="display:none;" alt="seu comprovante">
+<button class="botao-modal botao-comprovante" style="margin-top:12px;" onclick="enviarComprovanteModal()">✅ CONFIRMAR ENVIO</button>
+</div>
+</div>
+<div class="modal-botoes"><button class="botao-modal botao-fazer" id="botaoFazerTarefa">▶️ FAZER TAREFA</button></div>
+<button class="botao-cancelar" onclick="fecharModal()">Fechar</button>
+</div>
+</div>
+</div>
+
+<!-- TELA LOGIN -->
+<div id="tela-login">
+<div class="topo"><h1>🔥 GANHA MAIS 💰</h1><p>1.000 PONTOS = R$ 1,00 | Saque Mínimo R$ 10,00</p></div>
+<div class="branco">
+<div class="abas">
+<button onclick="mostrarCadastro()" id="aba-cadastro" class="ativa">📝 CADASTRAR</button>
+<button onclick="mostrarLogin()" id="aba-login">🔑 ENTRAR</button>
+</div>
+<div id="form-login" class="esconder">
+<form onsubmit="fazerLogin(event)" autocomplete="on">
+<label>E-MAIL OU TELEFONE</label><input type="text" id="login-email" name="username" placeholder="Digite seu e-mail ou telefone" autocomplete="username">
+<label>SENHA</label>
+<div class="senha-caixa">
+<input type="password" id="login-senha" name="password" placeholder="Digite sua senha" autocomplete="current-password">
+<span class="olho" id="olhinhoLogin" onclick="trocarOlhoLogin()">👁️</span>
+</div>
+<div class="msg-erro" id="msgErroLogin"></div>
+<button type="submit" class="principal">✅ ENTRAR</button>
+</form>
+</div>
+<div id="form-cadastro">
+<form onsubmit="fazerCadastro(event)" autocomplete="on">
+<label>NOME COMPLETO</label><input type="text" id="cad-nome" name="name" placeholder="Nome e sobrenome" autocomplete="name">
+<label>E-MAIL OU TELEFONE</label><input type="text" id="cad-contato" name="username" placeholder="Digite seu e-mail ou telefone" autocomplete="username">
+<label>CRIE SUA SENHA</label>
+<div class="senha-caixa">
+<input type="password" id="cad-senha" name="new-password" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+<span class="olho" id="olhinhoCad" onclick="trocarOlhoCad()">👁️</span>
+</div>
+<div class="msg-erro" id="msgErroCad"></div>
+<button type="submit" class="principal">✅ CADASTRAR</button>
+</form>
+</div>
+</div>
+</div>
+
+<!-- TELA INÍCIO -->
+<div id="tela-inicio" class="esconder">
+<div class="topo"><h1>🔥 GANHA MAIS 💰</h1><p>Bem-vindo, <span id="nomeUsuario">Usuário</span>!</p></div>
+<div class="verde"><div class="saldo-grande">Seu Saldo: <span id="saldoUsuario">0</span> PONTOS</div><div class="valor-real">= R$ <span id="valorRealInicio">0,00</span></div></div>
+<div class="saque-notif-area" id="saqueNotifArea">
+<div class="saque-notif-banner" onclick="mostrarTela('saques-admin')"><span class="sino">🔔</span> <span class="num" id="saqueNotifNum">0</span> SAQUES PENDENTES — toque para liberar 💸</div>
+</div>
+<div class="ouro-bloco">
+<h3>🎯 CONVIDE E GANHE!</h3>
+<div class="regra">Convide amigos! Ganhe 500 PONTOS = R$ 0,50 quando eles completarem a 1ª tarefa ✅</div>
+<div class="link-caixa"><span id="linkConvite">Carregando...</span><button class="btn-copiar" onclick="copiarLink()">📋 Copiar</button></div>
+<div class="contagem"><div><strong id="qtdConvidados">0</strong><span>Convidados</span></div><div><strong id="qtdAtivos">0</strong><span>Ativos ✅</span></div></div>
+</div>
+<div class="abas-tarefas">
+<button class="aba-tarefa ativa" onclick="mudarAbaTarefas('tarefas')">📋 Tarefas</button>
+<button class="aba-tarefa" onclick="mudarAbaTarefas('minhas')">📜 Minhas Tarefas</button>
+</div>
+<div id="viewTarefas">
+<div style="padding:0 12px;"><h3 style="color:#0369a1;margin:10px 0 5px 0;font-size:18px;font-weight:700;">📋 TAREFAS DISPONÍVEIS</h3></div>
+<div id="listaTarefas"><div class="sem-dados">Nenhuma tarefa disponível no momento 🎯</div></div>
+</div>
+<div id="viewMinhasTarefas" class="esconder">
+<div class="hist-info"><span>📜 Tarefas concluídas · Histórico permanente</span><strong id="qtdConcluidas">0</strong></div>
+<div id="listaMinhasTarefas"><div class="sem-dados">Você ainda não fez nenhuma tarefa 🎯</div></div>
+</div>
+<div class="menu-baixo sumir-rolagem">
+<button onclick="mostrarTela('inicio')" class="ativo">🏠 Início</button>
+<button onclick="mostrarTela('sacar')">💰 Sacar</button>
+<button onclick="mostrarTela('ajuda')">🆘 Ajuda</button>
+<button onclick="sair()">🚪 Sair</button>
+</div>
+</div>
+
+<!-- TELA AJUDA -->
+<div id="tela-ajuda" class="esconder">
+<div class="topo"><h1>🆘 CENTRO DE AJUDA</h1><p>Tudo o que você precisa saber</p></div>
+<div class="branco">
+<h4 style="color:#0284c7;margin-bottom:12px;font-size:17px;">💰 Como funcionam os pontos?</h4>
+<p style="color:#4b5563;line-height:1.7;margin-bottom:20px;font-size:14px;">Cada <strong>1.000 pontos</strong> equivalem a <strong>R$ 1,00 real</strong>. Você acumula pontos ao completar tarefas disponíveis e ao convidar amigos que também completam tarefas.</p>
+
+<h4 style="color:#0284c7;margin-bottom:12px;font-size:17px;">📋 Como fazer uma tarefa?</h4>
+<p style="color:#4b5563;line-height:1.7;margin-bottom:20px;font-size:14px;">
+1. Na tela inicial, escolha uma tarefa e clique em <strong>"▶️ FAZER TAREFA"</strong><br>
+2. Leia atentamente as <strong>regras da tarefa</strong> no modal que abrir<br>
+3. Veja o <strong>exemplo de comprovante</strong> para saber como enviar<br>
+4. Clique em <strong>"📷 Envie seu comprovante"</strong> e selecione sua foto<br>
+5. Clique em <strong>"✅ CONFIRMAR ENVIO"</strong><br>
+6. Clique em <strong>"▶️ FAZER TAREFA"</strong> para ir ao site/app e realizar a ação<br>
+7. Aguarde a <strong>aprovação</strong> da sua prova! ⏳
+</p>
+
+<h4 style="color:#0284c7;margin-bottom:12px;font-size:17px;">🎯 Como funciona o sistema de convite?</h4>
+<p style="color:#4b5563;line-height:1.7;margin-bottom:20px;font-size:14px;">
+• Copie seu <strong>link de convite</strong> na tela inicial<br>
+• Envie para amigos! Quando eles se cadastrarem pelo seu link, contam como seus convidados<br>
+• <strong>Convidados:</strong> quantas pessoas se cadastraram pelo seu link<br>
+• <strong>Ativos ✅:</strong> quantas dessas pessoas completaram e tiveram aprovada a <strong>1ª tarefa</strong><br>
+• Quando um convidado fica ativo, você ganha <strong>500 PONTOS = R$ 0,50</strong> automaticamente! 🎁
+</p>
+
+<h4 style="color:#0284c7;margin-bottom:12px;font-size:17px;">💸 Como sacar meu dinheiro?</h4>
+<p style="color:#4b5563;line-height:1.7;margin-bottom:20px;font-size:14px;">
+• Saldo mínimo para saque: <strong>R$ 10,00</strong> (10.000 pontos)<br>
+• Vá na aba <strong>"💰 Sacar"</strong><br>
+• Preencha seu <strong>nome completo</strong>, <strong>valor</strong> e <strong>chave PIX</strong><br>
+• Clique em <strong>"✅ SOLICITAR SAQUE"</strong><br>
+• Aguarde a aprovação do administrador ⏳<br>
+• Acompanhe o status dos seus saques na lista abaixo!
+</p>
+
+<h4 style="color:#0284c7;margin-bottom:12px;font-size:17px;">⏱️ Quanto tempo demora para aprovar?</h4>
+<p style="color:#4b5563;line-height:1.7;margin-bottom:20px;font-size:14px;">
+As provas de tarefas e saques são analisados diariamente pelo administrador. O prazo médio é de <strong>algumas horas até 1 dia útil</strong>. Fique de olho no status!
+</p>
+
+<h4 style="color:#0284c7;margin-bottom:12px;font-size:17px;">❌ Por que minha prova foi rejeitada?</h4>
+<p style="color:#4b5563;line-height:1.7;margin-bottom:20px;font-size:14px;">
+• Foto <strong>borrada</strong> ou <strong>incompleta</strong><br>
+• Não seguiu as <strong>regras da tarefa</strong><br>
+• Comprovante <strong>falsificado</strong> ou <strong>recortado</strong><br>
+• Dados não conferem com o que foi pedido<br>
+<br>
+💡 <strong>Dica:</strong> Se foi rejeitada, você pode <strong>reenviar</strong> uma nova prova corretamente!
+</p>
+
+<h4 style="color:#0284c7;margin-bottom:12px;font-size:17px;">📞 Precisa de ajuda?</h4>
+<p style="color:#4b5563;line-height:1.7;font-size:14px;">
+Entre em contato com nosso suporte clicando no botão roxo 💬 no canto inferior direito da tela! Estamos prontos para ajudar! 💪
+</p>
+</div>
+<div class="menu-baixo sumir-rolagem">
+<button onclick="mostrarTela('inicio')">🏠 Início</button>
+<button onclick="mostrarTela('sacar')">💰 Sacar</button>
+<button onclick="mostrarTela('ajuda')" class="ativo">🆘 Ajuda</button>
+<button onclick="sair()">🚪 Sair</button>
+</div>
+</div>
+
+<!-- TELA SACAR -->
+<div id="tela-sacar" class="esconder">
+<div class="topo"><h1>💸 SACAR</h1><p>Solicite seu saque via PIX</p></div>
+<div class="verde"><div class="saldo-grande">Seu Saldo: <span id="saldoSacar">0</span> PONTOS</div><div class="valor-real">= R$ <span id="valorRealSacar">0,00</span></div></div>
+<div class="branco">
+<p style="text-align:center;color:#78350f;font-weight:600;margin-bottom:15px;font-size:14px;">💱 1.000 PONTOS = R$ 1,00 | Mínimo: R$ 10,00</p>
+<label>NOME COMPLETO</label><input type="text" id="nomeSaque" placeholder="Nome e sobrenome" oninput="salvarDadosSaqueTemp()">
+<label>VALOR (R$)</label><input type="number" id="valorSaque" placeholder="10,00" min="10" step="0.01">
+<label>TIPO DE CHAVE PIX</label>
+<button type="button" class="chave-btn" onclick="alternarChaves()"><span id="textoChave">Selecione</span><span>▼</span></button>
+<div class="chaves-opcoes" id="opcoesChave">
+<button class="btn-chave" onclick="definirChave('CPF')">CPF</button>
+<button class="btn-chave" onclick="definirChave('EMAIL')">E-MAIL</button>
+<button class="btn-chave" onclick="definirChave('TELEFONE')">TELEFONE</button>
+<button class="btn-chave" onclick="definirChave('ALEATÓRIA')">ALEATÓRIA</button>
+</div>
+<label>CHAVE PIX</label><input type="text" id="chavePixValor" placeholder="Digite sua chave PIX" oninput="salvarDadosSaqueTemp()">
+<button type="button" class="btn btn-x" onclick="apagarChave()">🗑️ Apagar dados salvos</button>
+<div class="msg-erro" id="erroSaque"></div>
+<div class="msg-ok" id="sucessoSaque"></div>
+<button class="principal" onclick="solicitarSaque()">✅ SOLICITAR SAQUE</button>
+<hr>
+<h3 style="color:#0369a1;margin-bottom:10px;font-size:17px;">📜 MEUS SAQUES</h3>
+<div id="listaSaques"><div class="sem-dados">Nenhum saque solicitado ainda 💸</div></div>
+</div>
+<div class="menu-baixo sumir-rolagem">
+<button onclick="mostrarTela('inicio')">🏠 Início</button>
+<button onclick="mostrarTela('sacar')" class="ativo">💰 Sacar</button>
+<button onclick="mostrarTela('ajuda')">🆘 Ajuda</button>
+<button onclick="sair()">🚪 Sair</button>
+</div>
+</div>
+
+<!-- TELA BUSCA -->
+<div id="tela-busca" class="esconder">
+<div class="topo"><h1>🔍 BUSCAR / PONTOS</h1><p>Gerencie usuários, pontos e admin</p></div>
+<div class="branco">
+<label>Nome, e-mail ou telefone</label><input type="text" id="campoBusca" placeholder="Digite para buscar..." oninput="buscarUsuario()">
+<div id="resultadoBusca"></div>
+</div>
+</div>
+
+<!-- TELA PAINEL -->
+<div id="tela-painel" class="esconder">
+<div class="topo"><h1>📊 PAINEL GERAL</h1><p>Tudo atualizado em tempo real 🔄</p></div>
+<div class="branco">
+<div class="painel-grid">
+<div class="painel-card"><div class="numero" id="totalUsuarios">0</div><div class="rotulo">👥 Usuários Cadastrados</div></div>
+<div class="painel-card"><div class="numero" id="qtdOnline">0</div><div class="rotulo">🟢 Online Agora</div></div>
+<div class="painel-card"><div class="numero" id="valorTotalPago">R$ 0,00</div><div class="rotulo">💵 Total Já Pago</div></div>
+<div class="painel-card"><div class="numero" id="saquesPendentes">0</div><div class="rotulo">⏳ Saques Pendentes</div></div>
+<div class="painel-card"><div class="numero" id="provasPendentes">0</div><div class="rotulo">📥 Provas Pendentes</div></div>
+<div class="painel-card"><div class="numero" id="pontosEmCirculacao">0</div><div class="rotulo">💰 Pontos Ativos</div></div>
+</div>
+</div>
+</div>
+
+<!-- TELA USUÁRIOS -->
+<div id="tela-pessoas" class="esconder">
+<div class="topo"><h1>👥 USUÁRIOS CADASTRADOS</h1><p>Lista completa com status online/offline</p></div>
+<div class="branco"><div id="listaPessoas"><div class="sem-dados">Nenhum usuário cadastrado ainda</div></div></div>
+</div>
+
+<!-- ✅ TELA 1: CADASTRAR TAREFA - MODO PRO -->
+<div id="tela-editor" class="esconder">
+<div class="topo"><h1>✏️ CADASTRAR TAREFA</h1><p>Adicione, edite e exclua tarefas aqui</p></div>
+<div class="branco">
+
+<div id="statusAdminCard"></div>
+
+<div id="avisoEdicaoCard" class="aviso-edicao esconder">📝 MODO EDIÇÃO ATIVO - Altere os dados e clique em "ATUALIZAR"</div>
+
+<label>📌 NOME DA TAREFA *</label>
+<input type="text" id="tituloTarefa" placeholder="Ex: TikTok Lite">
+
+<label>🖼️ URL DA FOTO (pequena)</label>
+<input type="text" id="fotoTarefa" placeholder="https://...foto.jpg" oninput="previewFotoCard()">
+<img id="previewCard" class="preview-foto esconder" alt="preview">
+
+<label>📊 NÍVEL *</label>
+<select id="nivelTarefa">
+<option value="Fácil">🟢 Fácil</option>
+<option value="Médio">🟡 Médio</option>
+<option value="Difícil">🔴 Difícil</option>
+</select>
+
+<label>💰 PONTOS *</label>
+<input type="number" id="pontosTarefa" placeholder="Ex: 1000" min="1">
+
+<label>📝 DESCRIÇÃO CURTA</label>
+<input type="text" id="descricaoTarefa" placeholder="Aparece no card da tarefa">
+
+<button class="principal" id="btnSalvarCard" onclick="salvarTarefaCard()">✅ ADICIONAR TAREFA</button>
+<button class="btn btn-x esconder" id="btnCancelarCard" onclick="cancelarEdicaoCard()">❌ CANCELAR EDIÇÃO</button>
+
+<div id="feedbackCard"></div>
+
+<hr>
+<hr>
+<h3 style="color:#0369a1;margin-bottom:10px;font-size:17px;font-weight:700;">📋 SUAS TAREFAS</h3>
+<div id="debug_listaTarefasAdmin" style="font-size:12px;font-weight:700;padding:8px;margin-bottom:8px;border-radius:8px;background:#f0f9ff;display:none;"></div>
+<div id="listaTarefasAdmin"><div class="sem-dados">Carregando tarefas...</div></div>
+</div>
+</div>
+
+<!-- ✅ TELA 2: DETALHES MODAL - MODO PRO -->
+<div id="tela-editor-modal" class="esconder">
+<div class="topo"><h1>🎯 DETALHES DA TAREFA</h1><p>Regras, link e foto de exemplo</p></div>
+<div class="branco">
+
+<div id="statusAdminModal"></div>
+
+<label>🔍 SELECIONE A TAREFA *</label>
+<select id="selectTarefaModal" onchange="carregarDadosModal()">
+<option value="">-- Escolha uma tarefa --</option>
+</select>
+
+<div id="dadosModalArea" class="esconder">
+<label>🔗 LINK DA TAREFA</label>
+<input type="text" id="linkTarefaModal" placeholder="https://...">
+
+<label>📋 REGRAS COMPLETAS (uma por linha)</label>
+<textarea id="regrasTarefaModal" placeholder="✅ Ajude com sucesso&#10;✅ Conclua todas as etapas&#10;✅ Envie o comprovante"></textarea>
+
+<label>🖼️ URL DA FOTO DE EXEMPLO</label>
+<input type="text" id="fotoExemploModal" placeholder="https://...exemplo.jpg" oninput="previewFotoModal()">
+<img id="previewModal" class="preview-foto esconder" alt="preview">
+
+<button class="principal" id="btnSalvarModal" onclick="salvarTarefaModal()">💾 SALVAR DETALHES</button>
+<div id="feedbackModal"></div>
+</div>
+
+<hr>
+<hr>
+<h3 style="color:#0369a1;margin-bottom:10px;font-size:17px;font-weight:700;">📋 EXCLUIR TAREFAS</h3>
+<div id="debug_listaTarefasModal" style="font-size:12px;font-weight:700;padding:8px;margin-bottom:8px;border-radius:8px;background:#f0f9ff;display:none;"></div>
+<div id="listaTarefasModal"><div class="sem-dados">Carregando...</div></div>
+</div>
+</div>
+
+<!-- TELA ANÁLISE PROVAS -->
+<div id="tela-analise" class="esconder">
+<div class="topo"><h1>📥 APROVAR PROVAS</h1><p>Valide comprovantes</p></div>
+<div class="branco"><div id="listaAnalise"><div class="sem-dados">Nenhuma prova pendente ✅</div></div></div>
+</div>
+
+<!-- TELA SAQUES ADMIN -->
+<div id="tela-saques-admin" class="esconder">
+<div class="topo"><h1>💸 LIBERAR SAQUES</h1><p>Aprove ou rejeite</p></div>
+<div class="branco"><div id="listaSaquesAdmin"><div class="sem-dados">Nenhum saque pendente ✅</div></div></div>
+</div>
+
+<script>
+// ============================================================
+// CONFIGURAÇÃO FIREBASE
+// ============================================================
+const firebaseConfig = {
+apiKey: "AIzaSyAjptAq1R1wWbvD5Wgv-OAFji9lyzyPGCg",
+authDomain: "ganha-mais-445e8.firebaseapp.com",
+databaseURL: "https://ganha-mais-445e8-default-rtdb.firebaseio.com",
+projectId: "ganha-mais-445e8",
+storageBucket: "ganha-mais-445e8.firebasestorage.app",
+messagingSenderId: "350630040262",
+appId: "1:350630040262:web:5ec5129578ac73431fbdc7"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const DONO_EMAIL = 'victormarinhovv@gmail.com';
+const DONO_NOME = 'Victor Marinho Pereira Bento dos Santos';
+const DONO_SENHA = 'victor';
+const P_POR_REAL = 1000;
+const SAQUE_MIN_REAL = 10;
+const P_CONVITE_ATIVO = 500;
+const TEMPO_OFFLINE = 5000; // 🔴 5 SEGUNDOS! (ultra rápido — quem sai some em até 5s)
+
+let usuarioAtual = null;
+let tipoChave = '';
+let menuAdminAberto = false;
+let ultimaAtividade = Date.now();
+let tarefaAtualModal = null;
+let tarefaSelecionadaId = null;
+let editandoCardId = null;
+let intervaloPresenca = null; // controla o interval de heartbeat (evita vários rodando ao mesmo tempo)
+let refPresencaAtual = null;  // guarda a referência de status do usuário atual
+let adminCache = false; // 🔒 cache permanente de admin — NUNCA é sobrescrito (evita bug de perder permissão)
+
+// ============================================================
+// 🔧 SISTEMA DE LISTENERS ÚNICOS - CORRIGE DUPLICAÇÃO!
+// ============================================================
+// Antes: cada vez que abria a tela, criava um listener NOVO
+// Agora: só existe UM listener global para cada coisa
+// ============================================================
+const LISTENERS = {};
+
+function ativarListenerUnico(nome, ref, fn) {
+  // Se já existe um listener com esse nome, remove ele primeiro
+  if (LISTENERS[nome]) {
+    try { LISTENERS[nome].ref.off('value', LISTENERS[nome].fn); } catch(e) {}
+  }
+  // Cria o novo listener
+  ref.on('value', fn);
+  LISTENERS[nome] = { ref, fn };
+  console.log('🔄 Listener "' + nome + '" ativado (único)');
+}
+
+function removerTodosListeners() {
+  Object.keys(LISTENERS).forEach(nome => {
+    try { LISTENERS[nome].ref.off('value', LISTENERS[nome].fn); } catch(e) {}
+  });
+  Object.keys(LISTENERS).forEach(k => delete LISTENERS[k]);
+  console.log('🧹 Todos os listeners removidos');
+}
+
+// ============================================================
+// FUNÇÕES BÁSICAS
+// ============================================================
+function $(id) { return document.getElementById(id); }
+function real(v) { return (Number(v) || 0).toFixed(2).replace('.', ','); }
+function dataHoraFormatada(ts) { if(!ts) return '—'; const d=new Date(ts); return isNaN(d)?'—':d.toLocaleString('pt-BR'); }
+function nomeValido(n) { if(!n) return false; const p=n.trim().split(' '); return p.length>=2 && p[0].length>1 && p[p.length-1].length>1; }
+function registrarAtividade() { ultimaAtividade = Date.now(); }
+// 🔒 Proteção XSS: escapa HTML antes de mostrar na tela
+function esc(s) { if(s == null) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+// Detecta QUALQUER atividade do usuário para manter status ONLINE
+['click','touchstart','keypress','mousemove','scroll','input'].forEach(evt => {
+  document.addEventListener(evt, registrarAtividade, { passive: true });
+});
+function ehDono(c) { return c && normalizarContato(c) === normalizarContato(DONO_EMAIL); }
+function eAdmin() { return adminCache || (usuarioAtual && (usuarioAtual.admin === true || usuarioAtual.admin === 'true' || ehDono(usuarioAtual.contato))); }
+function urlValida(u) { if(!u) return true; try { new URL(u); return true; } catch(e) { return false; } }
+// 🔀 Ordena tarefas: MAIS VELHA PRIMEIRO (no topo), mais nova embaixo (última).
+// Se duas tiverem o mesmo criadoEm, desempata pela chave do Firebase (mais velha primeiro).
+function ordenarTarefas(arr) {
+  return arr.sort((a,b) => {
+    const ta = Number(a.criadoEm) || 0;
+    const tb = Number(b.criadoEm) || 0;
+    if(ta !== tb) return ta - tb; // mais velha primeiro
+    return String(a.key || '').localeCompare(String(b.key || '')); // desempate: chave menor = mais velha
+  });
+}
+// 🔍 Normaliza contato para busca: tira espaços, deixa minúsculo, e se for telefone tira tudo que não é número
+function normalizarContato(c) {
+  if(!c) return '';
+  let s = String(c).trim().toLowerCase();
+  const soDigitos = s.replace(/\D/g, '');
+  if(soDigitos.length >= 8) return soDigitos; // telefone -> compara só números
+  return s; // email -> minúsculo sem espaços
+}
+// 🔍 Busca usuário por contato de forma robusta (funciona mesmo com formato diferente)
+async function buscarUsuarioPorContato(contato) {
+  const alvo = normalizarContato(contato);
+  if(!alvo) return null;
+  const snap = await db.ref('usuarios').once('value');
+  let encontrado = null;
+  snap.forEach(u => {
+    const d = u.val() || {};
+    if(normalizarContato(d.contato) === alvo) { encontrado = { uid: u.key, dados: d }; }
+  });
+  return encontrado;
+}
+
+// ============================================================
+// TOAST - NOTIFICAÇÃO
+// ============================================================
+function mostrarToast(mensagem, tipo = 'info', duracao = 3000) {
+const t = $('toast');
+if(!t) return;
+t.textContent = mensagem;
+t.className = 'toast ' + tipo + ' mostrar';
+setTimeout(() => { t.classList.remove('mostrar'); }, duracao);
+}
+
+// ============================================================
+// CRIAR CONTA DO DONO
+// ============================================================
+async function criarContaDono() {
+try {
+const achado = await buscarUsuarioPorContato(DONO_EMAIL);
+if(!achado) {
+const uid = db.ref('usuarios').push().key;
+await db.ref('usuarios/' + uid).set({
+nome: DONO_NOME, contato: DONO_EMAIL, senha: DONO_SENHA,
+pontos: 0, admin: true, convidou: null, convidados: 0, ativos: 0,
+dataCadastro: firebase.database.ServerValue.TIMESTAMP
+});
+console.log('👑 Conta do DONO criada automaticamente!');
+}
+} catch(e) { console.error('Erro criar dono:', e); }
+}
+
+// ============================================================
+// VERIFICAR STATUS ADMIN
+// ============================================================
+function verificarAdmin(qual) {
+const el = $('statusAdmin' + qual);
+if(!el) return;
+if(eAdmin()) {
+el.innerHTML = '✅ PERMISSÃO CONFIRMADA';
+el.className = 'admin-verificado';
+} else {
+el.innerHTML = '❌ SEM PERMISSÃO - Entre com a conta de admin';
+el.className = 'admin-negado';
+}
+}
+
+// ============================================================
+// EXIBIÇÃO DE TELAS
+// ============================================================
+function mostrarTela(nome) {
+registrarAtividade();
+['login','inicio','ajuda','sacar','busca','pessoas','painel','editor','editor-modal','analise','saques-admin'].forEach(t => {
+const el = $('tela-' + t); if(el) el.classList.add('esconder');
+});
+const alvo = $('tela-' + nome); if(alvo) alvo.classList.remove('esconder');
+$('adminTopo')?.classList.toggle('mostrar', nome !== 'login' && eAdmin());
+document.querySelectorAll('.menu-baixo button').forEach(b => b.classList.remove('ativo'));
+const mapa = {inicio:0, sacar:1, ajuda:2};
+if(mapa[nome] !== undefined) {
+const botoes = document.querySelectorAll('#tela-' + nome + ' .menu-baixo button');
+if(botoes[mapa[nome]]) botoes[mapa[nome]].classList.add('ativo');
+}
+if(usuarioAtual) {
+if(nome === 'inicio') { setTimeout(carregarTarefasUsuario, 100); }
+if(nome === 'painel') carregarPainel();
+if(nome === 'pessoas') carregarUsuarios();
+if(nome === 'sacar') { atualizarSaldoSaque(); carregarDadosSaqueSalvos(); carregarSaquesUsuario(); }
+if(nome === 'editor') { cancelarEdicaoCard(); verificarAdmin('Card'); carregarListaTarefasAdmin(); setTimeout(carregarListaTarefasAdmin, 500); }
+if(nome === 'editor-modal') { verificarAdmin('Modal'); carregarSelectModal(); carregarListaTarefasModal(); }
+if(nome === 'analise') carregarProvasPendentes();
+if(nome === 'saques-admin') carregarSaquesPendentes();
+}
+}
+
+function mostrarLogin() {
+$('form-login').classList.remove('esconder');
+$('form-cadastro').classList.add('esconder');
+$('aba-login').classList.add('ativa');
+$('aba-cadastro').classList.remove('ativa');
+// Dá foco no campo de e-mail pra ativar o autocomplete do navegador
+setTimeout(() => { try { $('login-email').focus(); } catch(e){} }, 100);
+}
+function mostrarCadastro() {
+$('form-cadastro').classList.remove('esconder');
+$('form-login').classList.add('esconder');
+$('aba-cadastro').classList.add('ativa');
+$('aba-login').classList.remove('ativa');
+}
+function toggleMenuAdmin() { menuAdminAberto = !menuAdminAberto; $('menuAdmin').classList.toggle('aberto', menuAdminAberto); }
+function ir(pag) { toggleMenuAdmin(); mostrarTela(pag); }
+function voltarParaInicio() { toggleMenuAdmin(); mostrarTela('inicio'); }
+function trocarOlhoLogin() { const c=$('login-senha'),i=$('olhinhoLogin'); c.type=c.type==='password'?'text':'password'; i.textContent=c.type==='password'?'👁️':'🙈'; }
+function trocarOlhoCad() { const c=$('cad-senha'),i=$('olhinhoCad'); c.type=c.type==='password'?'text':'password'; i.textContent=c.type==='password'?'👁️':'🙈'; }
+
+// ============================================================
+// LOGIN / CADASTRO
+// ============================================================
+async function fazerLogin(e) {
+e.preventDefault();
+const contato = $('login-email').value.trim();
+const senha = $('login-senha').value;
+const erro = $('msgErroLogin'); erro.classList.remove('mostrar');
+if(!contato || senha.length < 6) { erro.textContent = '⚠️ Preencha todos os campos!'; erro.classList.add('mostrar'); return; }
+try {
+const achado = await buscarUsuarioPorContato(contato);
+if(!achado) { erro.textContent = '⚠️ Usuário não encontrado! Verifique o e-mail/telefone.'; erro.classList.add('mostrar'); return; }
+const uid = achado.uid, dados = achado.dados;
+if(dados.senha !== senha) { erro.textContent = '⚠️ Senha incorreta!'; erro.classList.add('mostrar'); return; }
+usuarioAtual = { id: uid, ...dados };
+adminCache = eAdmin(); // 🔒 grava admin permanente (não perde mais a permissão)
+localStorage.setItem('ganhaMaisLogin', JSON.stringify({ uid, contato: dados.contato }));
+await configurarPresenca();
+iniciarSistema();
+mostrarToast('✅ Login realizado com sucesso!', 'sucesso');
+mostrarTela('inicio');
+} catch(err) { erro.textContent = '❌ Erro: ' + err.message; erro.classList.add('mostrar'); }
+}
+
+async function fazerCadastro(e) {
+e.preventDefault();
+const nome = $('cad-nome').value.trim();
+const contato = $('cad-contato').value.trim().toLowerCase();
+const senha = $('cad-senha').value;
+const erro = $('msgErroCad'); erro.classList.remove('mostrar');
+if(!nomeValido(nome)) { erro.textContent = '⚠️ Digite seu NOME COMPLETO!'; erro.classList.add('mostrar'); return; }
+if(!contato) { erro.textContent = '⚠️ Digite e-mail ou telefone!'; erro.classList.add('mostrar'); return; }
+if(senha.length < 6) { erro.textContent = '⚠️ Senha mín 6 caracteres!'; erro.classList.add('mostrar'); return; }
+try {
+const jaExiste = await buscarUsuarioPorContato(contato);
+if(jaExiste) { erro.textContent = '⚠️ Já existe uma conta com este e-mail/telefone!'; erro.classList.add('mostrar'); return; }
+let convidou = null;
+const ref = new URLSearchParams(window.location.search).get('ref');
+if(ref && ref.length > 5) {
+const rs = await db.ref('usuarios/' + ref).once('value');
+if(rs.exists()) convidou = ref;
+}
+const uid = db.ref('usuarios').push().key;
+await db.ref('usuarios/' + uid).set({
+nome, contato, senha, pontos: 0, admin: ehDono(contato),
+convidou, convidados: 0, ativos: 0,
+dataCadastro: firebase.database.ServerValue.TIMESTAMP
+});
+if(convidou) await db.ref('usuarios/' + convidou + '/convidados').transaction(v => (v||0)+1);
+usuarioAtual = { id: uid, nome, contato, senha, pontos: 0, admin: ehDono(contato), convidou, convidados: 0, ativos: 0 };
+adminCache = eAdmin(); // 🔒 grava admin permanente
+localStorage.setItem('ganhaMaisLogin', JSON.stringify({ uid, contato }));
+await configurarPresenca();
+iniciarSistema();
+mostrarToast('✅ Conta criada com sucesso!', 'sucesso');
+mostrarTela('inicio');
+} catch(err) { erro.textContent = '❌ Erro: ' + err.message; erro.classList.add('mostrar'); }
+}
+
+async function sair() {
+if(usuarioAtual) {
+  try {
+    if(refPresencaAtual) { refPresencaAtual.onDisconnect().cancel(); }
+    await db.ref('status/' + usuarioAtual.id).update({ online: false });
+  } catch(e) {}
+}
+if(intervaloPresenca) { clearInterval(intervaloPresenca); intervaloPresenca = null; }
+removerTodosListeners();
+localStorage.removeItem('ganhaMaisLogin');
+usuarioAtual = null;
+refPresencaAtual = null;
+adminCache = false; // reseta cache de admin
+mostrarToast('👋 Sessão encerrada', 'info');
+mostrarTela('login');
+mostrarLogin();
+}
+
+async function verificarEntradaSalva() {
+const s = localStorage.getItem('ganhaMaisLogin');
+if(!s) return;
+try {
+const { uid } = JSON.parse(s);
+const snap = await db.ref('usuarios/' + uid).once('value');
+if(!snap.exists()) { localStorage.removeItem('ganhaMaisLogin'); return; }
+usuarioAtual = { id: uid, ...snap.val() };
+adminCache = eAdmin(); // 🔒 grava admin permanente
+await configurarPresenca();
+iniciarSistema();
+mostrarTela('inicio');
+} catch { localStorage.removeItem('ganhaMaisLogin'); }
+}
+
+async function configurarPresenca() {
+if(!usuarioAtual) return;
+// 🔧 Limpa interval anterior (evita vários rodando ao mesmo tempo — bug antigo)
+if(intervaloPresenca) { clearInterval(intervaloPresenca); intervaloPresenca = null; }
+// Cancela onDisconnect anterior (evita handlers duplicados)
+if(refPresencaAtual) { try { refPresencaAtual.onDisconnect().cancel(); } catch(e){} }
+const r = db.ref('status/' + usuarioAtual.id);
+refPresencaAtual = r;
+// 🧹 Remove a presença ANÔNIMA (visitante) pra não contar duplicado quando loga
+const vid = localStorage.getItem('ganhaMaisVisitante');
+if(vid) { try { db.ref('status/' + vid).remove(); } catch(e){} }
+await r.set({ online: true, ultimaVez: firebase.database.ServerValue.TIMESTAMP, nome: usuarioAtual.nome });
+
+// 🛑 onDisconnect: marca OFFLINE automaticamente quando a conexão cai (fecha aba, trava celular, etc.)
+// Isso resolve o bug de continuar "online" depois que sai do site!
+try { r.onDisconnect().update({ online: false, ultimaVez: firebase.database.ServerValue.TIMESTAMP }); } catch(e) {}
+
+// Heartbeat a cada 15s (leve e confiável) — atualiza ultimaVez pra contagem saber que tá vivo
+intervaloPresenca = setInterval(() => {
+if(!usuarioAtual) return;
+const estaAtivo = (Date.now() - ultimaAtividade) < TEMPO_OFFLINE;
+r.update({ online: estaAtivo, ultimaVez: firebase.database.ServerValue.TIMESTAMP }).catch(()=>{});
+}, 1000); // ⚡ a cada 1 SEGUNDO (atualização instantânea!)
+
+// Ao fechar a página (reforço extra)
+window.addEventListener('beforeunload', () => {
+  if(usuarioAtual) { try { db.ref('status/' + usuarioAtual.id).update({ online: false }); } catch(e){} }
+});
+}
+
+// 👥 Presença ANÔNIMA: conta visitantes mesmo antes de cadastrar/logar
+// (resolve o bug de "só conta depois que faz cadastro")
+function configurarPresencaAnonima() {
+let vid = localStorage.getItem('ganhaMaisVisitante');
+if(!vid) { vid = 'visitante_' + Math.random().toString(36).substr(2, 12); localStorage.setItem('ganhaMaisVisitante', vid); }
+const r = db.ref('status/' + vid);
+r.set({ online: true, ultimaVez: firebase.database.ServerValue.TIMESTAMP, anonimo: true }).catch(()=>{});
+try { r.onDisconnect().update({ online: false, ultimaVez: firebase.database.ServerValue.TIMESTAMP }); } catch(e) {}
+setInterval(() => {
+  r.update({ online: true, ultimaVez: firebase.database.ServerValue.TIMESTAMP }).catch(()=>{});
+}, 2000); // ⚡ visitante: a cada 2 segundos
+}
+
+// 🧹 LIMPEZA CONTÍNUA: roda a cada 5s em TODO cliente conectado.
+// Qualquer pessoa online ajuda a limpar quem saiu. Contador fica 100% preciso em até 5s.
+let intervaloLimpeza = null;
+function limparStatusAntigos() {
+  try {
+    db.ref('status').once('value').then(snap => {
+      const agora = Date.now();
+      const LIMPEZA_THRESHOLD = 30000; // 🔧 30s pra limpeza (conservador — evita oscilação 0↔1 por diferença de relógio)
+      snap.forEach(x => {
+        const d = x.val() || {};
+        const tempo = Number(d.ultimaVez) || 0;
+        if(d.online === true && (agora - tempo) > LIMPEZA_THRESHOLD) {
+          db.ref('status/' + x.key + '/online').set(false).catch(()=>{});
+        }
+      });
+    }).catch(()=>{});
+  } catch(e) {}
+}
+function iniciarLimpezaContinua() {
+  if(intervaloLimpeza) return; // já tá rodando
+  limparStatusAntigos(); // roda na hora
+  intervaloLimpeza = setInterval(limparStatusAntigos, 5000); // e a cada 5s
+}
+
+// ============================================================
+// 🚀 INICIAR SISTEMA - LISTENERS GLOBAIS ÚNICOS
+// ============================================================
+function iniciarSistema() {
+  if(!usuarioAtual) return;
+  console.log('🚀 Iniciando sistema com listeners ÚNICOS...');
+
+  // Dados básicos do usuário
+  $('nomeUsuario').textContent = usuarioAtual.nome.split(' ')[0];
+  $('linkConvite').textContent = window.location.origin + window.location.pathname + '?ref=' + usuarioAtual.id;
+
+  // 🔹 Listener ÚNICO: Pontos do usuário
+  ativarListenerUnico('usuario_pontos', db.ref('usuarios/' + usuarioAtual.id + '/pontos'), (s) => {
+    const p = Number(s.val()) || 0;
+    if($('saldoUsuario')) $('saldoUsuario').textContent = p;
+    if($('valorRealInicio')) $('valorRealInicio').textContent = real(p / P_POR_REAL);
+    if($('saldoSacar')) $('saldoSacar').textContent = p;
+    if($('valorRealSacar')) $('valorRealSacar').textContent = real(p / P_POR_REAL);
+  });
+
+  // 🔹 Listener ÚNICO: Dados completos do usuário (convidados, ativos)
+  ativarListenerUnico('usuario_dados', db.ref('usuarios/' + usuarioAtual.id), (s) => {
+    const d = s.val() || {};
+    usuarioAtual = { id: usuarioAtual.id, ...d };
+    if($('qtdConvidados')) $('qtdConvidados').textContent = Number(d.convidados) || 0;
+    if($('qtdAtivos')) $('qtdAtivos').textContent = Number(d.ativos) || 0;
+    $('adminTopo')?.classList.toggle('mostrar', eAdmin());
+  });
+
+  // 🔹 Listener ÚNICO: TAREFAS (o coração do sistema!)
+  //    Tanto a tela do ADMIN quanto a tela do USUÁRIO usam ESTE MESMO listener
+  //    🔴 Corrigido: antes usava orderByChild('criadoEm') que pode falhar sem .indexOn no Firebase.
+  //    Agora escuta todas as tarefas e ordena no cliente (mais confiável).
+  ativarListenerUnico('tarefas_global', db.ref('tarefas'), (snap) => {
+    console.log('📋 Lista de tarefas atualizada!');
+    
+    // Se a tela INÍCIO (usuário) estiver aberta → atualiza ela
+    if(!$('tela-inicio').classList.contains('esconder')) {
+      atualizarTelaTarefasUsuario(snap);
+    }
+    
+    // Se a tela EDITOR (admin) estiver aberta → atualiza ela
+    if(!$('tela-editor').classList.contains('esconder')) {
+      atualizarTelaTarefasAdmin(snap);
+    }
+    
+    // Atualiza o SELECT da tela de detalhes
+    atualizarSelectTarefas(snap);
+    
+    // Se a tela DETALHES MODAL (admin) estiver aberta → atualiza a lista abaixo tambem (ao vivo!)
+    if(!$('tela-editor-modal').classList.contains('esconder')) {
+      carregarListaTarefasModal();
+    }
+  });
+
+  // 🔹 Contador de PESSOAS ONLINE (sempre atualiza, corrige o bug de aparecer zero)
+  ativarListenerUnico('online_contador', db.ref('status'), (snap) => {
+    let c = 0; const agora = Date.now();
+    snap.forEach(x => { const d = x.val()||{}; if(d.online === true && (agora - (Number(d.ultimaVez)||0)) < TEMPO_OFFLINE) c++; });
+    const oc = document.getElementById('onlineCount');
+    if(oc) oc.textContent = c;
+  });
+
+  // 🔹 Listener ÚNICO: Provas do usuário (para status das tarefas)
+  ativarListenerUnico('provas_usuario', db.ref('provas').orderByChild('uid').equalTo(usuarioAtual.id), () => {
+    // Quando uma prova muda, recarrega a lista de tarefas do usuário
+    if(!$('tela-inicio').classList.contains('esconder')) {
+      db.ref('tarefas').once('value').then(snap => {
+        atualizarTelaTarefasUsuario(snap);
+      });
+      // Se estiver na aba "Minhas Tarefas", atualiza o historico tambem
+      if($('viewMinhasTarefas') && !$('viewMinhasTarefas').classList.contains('esconder')) {
+        carregarMinhasTarefas();
+      }
+    }
+  });
+
+  // 🔹 Listener ÚNICO: Tarefas já FEITAS (aprovadas) — atualiza NA HORA que admin aprova!
+  ativarListenerUnico('tarefas_feitas', db.ref('usuarios/' + usuarioAtual.id + '/tarefasFeitas'), () => {
+    if(!$('tela-inicio').classList.contains('esconder')) {
+      db.ref('tarefas').once('value').then(snap => {
+        atualizarTelaTarefasUsuario(snap);
+      });
+    }
+  });
+
+  // 🔹 Listener ÚNICO: Saques do usuário
+  ativarListenerUnico('saques_usuario', db.ref('saques').orderByChild('uid').equalTo(usuarioAtual.id), (snap) => {
+    if(!$('tela-sacar').classList.contains('esconder')) {
+      renderizarSaquesUsuario(snap);
+    }
+  });
+
+  // 🔹 Listener ÚNICO AO VIVO: Saques pro ADMIN (atualiza sozinho quando chega saque novo!)
+  if(eAdmin()) {
+    ativarListenerUnico('saques_admin_ao_vivo', db.ref('saques'), () => {
+      if(!$('tela-saques-admin').classList.contains('esconder')) {
+        carregarSaquesPendentes();
+      }
+      // Atualiza também o contador do painel se estiver aberto
+      if(!$('tela-painel').classList.contains('esconder') && typeof carregarPainel === 'function') {
+        carregarPainel();
+      }
+    });
+  }
+}
+
+// ============================================================
+// 📋 FUNÇÕES DE RENDERIZAÇÃO DE TAREFAS
+// ============================================================
+
+// Busca as provas do usuário atual
+async function buscarProvasUsuario() {
+  if(!usuarioAtual) return {};
+  const snap = await db.ref('provas').orderByChild('uid').equalTo(usuarioAtual.id).once('value');
+  const envios = {};
+  const prioridade = { 'aprovado': 3, 'pendente': 2, 'rejeitado': 1 };
+  snap.forEach(e => {
+    const d = e.val();
+    if(!d || !d.tarefaId) return;
+    const antigo = envios[d.tarefaId];
+    // Se já tem uma prova desta tarefa, fica com a mais importante:
+    // 1) APROVADA sempre ganha (nunca pode ser sobrescrita)
+    // 2) Se não, a mais nova por data
+    if(!antigo) { envios[d.tarefaId] = d; return; }
+    const pNova = prioridade[d.status] || 0;
+    const pAntiga = prioridade[antigo.status] || 0;
+    if(pNova > pAntiga) { envios[d.tarefaId] = d; return; }
+    if(pNova === pAntiga && (Number(d.data)||0) > (Number(antigo.data)||0)) { envios[d.tarefaId] = d; }
+  });
+  return envios;
+}
+
+// Renderiza uma tarefa para o USUÁRIO (com botão FAZER TAREFA)
+function renderizarCardUsuario(t, envio, tarefasFeitas) {
+  const pts = Number(t.pontos) || 0;
+  const nv = t.nivel || 'Fácil';
+  const nc = nv === 'Fácil' ? 'nivel-facil' : (nv === 'Difícil' ? 'nivel-dificil' : 'nivel-medio');
+  
+  // 🔒 SE A TAREFA JÁ FOI APROVADA (tarefasFeitas), mostra APROVADA para SEMPRE
+  const jaAprovada = tarefasFeitas && tarefasFeitas[t.key] && (tarefasFeitas[t.key].feito === true || tarefasFeitas[t.key] === true);
+  
+  let btn = '';
+  let seloStatus = '';
+  if(jaAprovada) {
+    btn = `<button class="btn-tarefa-principal btn-aprovada" disabled>✅ TAREFA APROVADA — PONTOS NA CONTA!</button>`;
+    seloStatus = `<div style="margin-top:8px;background:#d1fae5;color:#065f46;padding:8px 12px;border-radius:10px;font-size:12px;font-weight:700;text-align:center;border:2px solid #6ee7b7;">✅ Missão cumprida! +${pts} pts recebidos</div>`;
+  } else if(!envio) {
+    btn = `<button class="btn-tarefa-principal btn-fazer" onclick='abrirModal(${JSON.stringify(t).replace(/'/g,"&apos;")})'>▶️ FAZER TAREFA</button>`;
+  } else {
+    if(envio.status === 'pendente') {
+      btn = `<button class="btn-tarefa-principal btn-aguarde" disabled>⏳ TAREFA ENVIADA — AGUARDE APROVAÇÃO</button>`;
+      seloStatus = `<div style="margin-top:8px;background:#fef3c7;color:#92400e;padding:8px 12px;border-radius:10px;font-size:12px;font-weight:700;text-align:center;border:2px solid #fcd34d;">⏳ Comprovante enviado! Analisando... ${dataHoraFormatada(envio.data)}</div>`;
+    }
+    else if(envio.status === 'aprovado') {
+      btn = `<button class="btn-tarefa-principal btn-aprovada" disabled>✅ TAREFA APROVADA — PONTOS NA CONTA!</button>`;
+      seloStatus = `<div style="margin-top:8px;background:#d1fae5;color:#065f46;padding:8px 12px;border-radius:10px;font-size:12px;font-weight:700;text-align:center;border:2px solid #6ee7b7;">✅ Missão cumprida! +${pts} pts recebidos</div>`;
+    }
+    else {
+      btn = `<button class="btn-tarefa-principal btn-rejeitada" disabled>❌ PROVA REJEITADA</button>
+    <button class="btn-tarefa-principal btn-fazer" style="margin-top:8px;" onclick='abrirModal(${JSON.stringify(t).replace(/'/g,"&apos;")})'>🔄 REENVIAR COMPROVANTE</button>`;
+      seloStatus = `<div style="margin-top:8px;background:#fee2e2;color:#991b1b;padding:8px 12px;border-radius:10px;font-size:12px;font-weight:700;text-align:center;border:2px solid #fca5a5;">❌ Rejeitado. Motivo: ${envio.motivo || 'Não segue as regras. Reenvie correto!'}</div>`;
+    }
+  }
+  
+  const fh = t.foto ? `<img class="tarefa-foto-card" src="${t.foto}">` : `<div class="tarefa-foto-card" style="display:flex;align-items:center;justify-content:center;font-size:28px;">📱</div>`;
+  
+  return `
+  <div class="tarefa" style="${jaAprovada ? 'opacity:0.85;border:2px solid #6ee7b7;' : ''}">
+    <div class="tarefa-cabecalho">
+      ${fh}
+      <div class="tarefa-info">
+        <h4>${esc(t.titulo) || 'Tarefa'}</h4>
+        <div class="tarefa-meta">
+          <span class="tarefa-nivel ${nc}">${esc(nv)}</span>
+          <span class="tarefa-pontos">${pts} pts</span>
+          <span class="tarefa-valor">= R$ ${real(pts/P_POR_REAL)}</span>
+        </div>
+        ${t.descricao ? `<div class="tarefa-descricao-curta">${esc(t.descricao)}</div>` : ''}
+      </div>
+    </div>
+    ${btn}
+    ${seloStatus}
+  </div>
+  `;
+}
+
+// Renderiza uma tarefa para o ADMIN (com botões EDITAR/EXCLUIR)
+function renderizarCardAdmin(t) {
+  const pts = Number(t.pontos) || 0;
+  const modalOk = t.link || t.regras || t.fotoExemplo;
+  // 🔒 Escapa TUDO que vem do banco — qualquer <, >, ', " quebrava o HTML e fazia a lista SUMIR
+  const tituloSeguro = esc(t.titulo) || '—';
+  const nivelSeguro = esc(t.nivel) || 'Fácil';
+  const descSegura = esc(t.descricao) || '';
+  const chaveSegura = String(t.key || '').replace(/'/g, '');
+  const nomeParaExcluir = (t.titulo || 'Sem nome').replace(/'/g, '').replace(/"/g, '&quot;');
+  
+  return `
+  <div class="item-lista">
+    <div style="font-weight:700;color:#0369a1;font-size:16px;">${tituloSeguro} <span style="font-size:12px;color:#6b7280;">(${nivelSeguro})</span></div>
+    <div class="dados-prova">💰 ${pts} pts = R$ ${real(pts/P_POR_REAL)}</div>
+    <div class="dados-prova">${modalOk ? '✅ Modal configurado' : '⚠️ Configure os detalhes em "🎯 Detalhes da Tarefa"'}</div>
+    ${descSegura ? `<div class="dados-prova">📝 ${descSegura}</div>` : ''}
+    <div class="botoes-duplos">
+      <button class="btn-editar" onclick="editarTarefaCard('${chaveSegura}')">✏️ EDITAR</button>
+      <button class="btn-excluir" onclick="excluirTarefa('${chaveSegura}','${nomeParaExcluir}')">🗑️ EXCLUIR</button>
+    </div>
+  </div>
+  `;
+}
+
+// ============================================================
+// 📋 PARTE 2: ATUALIZA TELA "TAREFAS DISPONÍVEIS" (usuários)
+// ============================================================
+async function atualizarTelaTarefasUsuario(snapTarefas) {
+  const lista = $('listaTarefas');
+  if(!lista) return;
+  
+  if(!snapTarefas.exists()) {
+    lista.innerHTML = '<div class="sem-dados">Nenhuma tarefa disponível no momento 🎯</div>';
+    return;
+  }
+  
+  // Busca as provas deste usuário
+  const provas = await buscarProvasUsuario();
+  // Busca as tarefas JÁ FEITAS (aprovadas permanentemente)
+  const tfSnap = await db.ref('usuarios/' + usuarioAtual.id + '/tarefasFeitas').once('value');
+  const tarefasFeitas = tfSnap.val() || {};
+  
+  // Monta a lista — TODAS as tarefas aparecem, sem limite!
+  const arr = [];
+  snapTarefas.forEach(t => {
+    const d = t.val() || {};
+    // Só esconde se a tarefa estiver explicitamente desativada (ativa: false)
+    if(d.ativa === false || d.ativa === 'false') return;
+    arr.push({ key: t.key, ...d });
+  });
+  ordenarTarefas(arr); // mais velha primeiro, mais nova embaixo
+  
+  if(arr.length === 0) {
+    lista.innerHTML = '<div class="sem-dados">Nenhuma tarefa disponível no momento 🎯</div>';
+    return;
+  }
+  
+  let html = '';
+  arr.forEach(t => { html += renderizarCardUsuario(t, provas[t.key], tarefasFeitas); });
+  lista.innerHTML = html;
+}
+
+// ============================================================
+// 📋 PARTE 1: ATUALIZA TELA "CADASTRAR TAREFA" (admin)
+// ============================================================
+function atualizarTelaTarefasAdmin(snapTarefas) {
+  const lista = $('listaTarefasAdmin');
+  if(!lista) return;
+  
+  if(!snapTarefas.exists()) {
+    lista.innerHTML = '<div class="sem-dados">📭 Nenhuma tarefa cadastrada ainda. Crie a primeira acima! 👆</div>';
+    return;
+  }
+  
+  const arr = [];
+  snapTarefas.forEach(t => arr.push({ key: t.key, ...t.val() }));
+  ordenarTarefas(arr); // mais velha primeiro, mais nova embaixo
+  
+  let html = '';
+  let erros = 0;
+  arr.forEach(t => {
+    try {
+      html += renderizarCardAdmin(t);
+    } catch(e) {
+      erros++;
+      console.error('Erro ao renderizar tarefa', t.key, e);
+      html += '<div class="item-lista" style="border-color:#ef4444;"><div style="color:#ef4444;font-weight:700;">⚠️ Tarefa com dados inválidos (ID: ' + t.key + ')</div><button class="btn-excluir" onclick="excluirTarefa(\'' + t.key + '\',\'tarefa_invalida\')">🗑️ EXCLUIR</button></div>';
+    }
+  });
+  if(erros > 0) console.warn(erros, 'tarefas com erro de renderização');
+  lista.innerHTML = html;
+}
+
+// ============================================================
+// 🔄 ATUALIZA SELECT DA TELA DE DETALHES
+// ============================================================
+function atualizarSelectTarefas(snapTarefas) {
+  const sel = $('selectTarefaModal');
+  if(!sel) return;
+  const selecionado = sel.value;
+  // Monta TODAS as options numa string primeiro (igual à lista de Excluir, que funciona)
+  let opts = '<option value="">-- Escolha uma tarefa --</option>';
+  try {
+    if(snapTarefas && snapTarefas.exists()) {
+      const arr = [];
+      snapTarefas.forEach(function(t){
+        try {
+          const v = t.val() || {};
+          arr.push(Object.assign({ key: t.key }, v));
+        } catch(e) { console.warn('Erro ao ler tarefa no select:', e); }
+      });
+      ordenarTarefas(arr); // mais velha primeiro, mais nova embaixo
+      for(let i = 0; i < arr.length; i++) {
+        try {
+          const t = arr[i];
+          const nome = esc(String(t.titulo || 'Sem nome'));
+          const chave = esc(String(t.key || ''));
+          opts += '<option value="' + chave + '">' + nome + '</option>';
+        } catch(e) { console.warn('Erro ao montar option:', e); }
+      }
+      console.log('🔽 Select de tarefas atualizado com', arr.length, 'tarefa(s)');
+    }
+  } catch(e) { console.error('Erro geral atualizarSelectTarefas:', e); }
+  sel.innerHTML = opts;
+  if(selecionado) { try { sel.value = selecionado; } catch(e){} }
+}
+
+// ============================================================
+// 📋 Função para carregar tarefas quando abre a tela início — robusto
+// ============================================================
+function carregarTarefasUsuario() {
+  db.ref('tarefas').once('value').then(snap => {
+    atualizarTelaTarefasUsuario(snap);
+  });
+}
+
+// ============================================================
+// MODAL DA TAREFA
+// ============================================================
+function abrirModal(t) {
+// 🔒 Se a tarefa já foi aprovada, NÃO abre o modal (não pode repetir!)
+if(usuarioAtual && usuarioAtual.tarefasFeitas && usuarioAtual.tarefasFeitas[t.key]) {
+  mostrarToast('✅ Esta tarefa já foi aprovada!', 'sucesso');
+  return;
+}
+tarefaAtualModal = t;
+if(t.foto) { $('modalIcone').src = t.foto; $('modalIcone').style.display='block'; }
+else $('modalIcone').style.display='none';
+$('modalTitulo').textContent = t.titulo || 'Tarefa';
+$('modalNivel').textContent = 'Nível: ' + (t.nivel || 'Fácil');
+$('modalPontos').textContent = Number(t.pontos) || 0;
+$('modalValor').textContent = 'R$ ' + real((Number(t.pontos)||0)/P_POR_REAL);
+
+const regras = (t.regras || '').split('\n').filter(r => r.trim());
+let hr = '';
+if(regras.length > 0) regras.forEach(r => {
+const tx = r.replace(/^✅\s*/,'').replace(/^-\s*/,'').trim();
+hr += `<div class="item-regra"><span>✅</span><span>${tx}</span></div>`;
+});
+else hr = `<div class="item-regra"><span>ℹ️</span><span>Siga as instruções no site!</span></div>`;
+$('modalRegras').innerHTML = hr;
+
+if(t.fotoExemplo) { $('modalExemplo').src = t.fotoExemplo; $('modalExemplo').style.display='block'; }
+else $('modalExemplo').style.display='none';
+
+$('fotoComprovanteModal').value = '';
+$('prevModal').style.display='none';
+$('botaoFazerTarefa').onclick = () => { if(t.link && t.link !== '#') window.open(t.link, '_blank'); };
+$('modalTarefa').style.display = 'flex';
+}
+
+function fecharModal() { $('modalTarefa').style.display='none'; tarefaAtualModal=null; }
+function previsualizarModal() {
+const i=$('fotoComprovanteModal'), p=$('prevModal');
+if(!i?.files?.[0]) return;
+const l = new FileReader();
+l.onload = e => { p.src = e.target.result; p.style.display='block'; };
+l.readAsDataURL(i.files[0]);
+}
+// Comprime foto do celular (que e grande) antes de enviar como base64
+function comprimirImagem(file, maxLado, qualidade) {
+  return new Promise((resolve, reject) => {
+    const leitor = new FileReader();
+    leitor.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if(w > h && w > maxLado){ h = Math.round(h * maxLado / w); w = maxLado; }
+        else if(h > maxLado){ w = Math.round(w * maxLado / h); h = maxLado; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', qualidade));
+      };
+      img.onerror = () => reject(new Error('Imagem inválida'));
+      img.src = e.target.result;
+    };
+    leitor.onerror = () => reject(new Error('Erro ao ler arquivo'));
+    leitor.readAsDataURL(file);
+  });
+}
+async function enviarComprovanteModal() {
+if(!tarefaAtualModal) return;
+// 🔒 Bloqueia envio se já foi aprovada
+if(usuarioAtual && usuarioAtual.tarefasFeitas && usuarioAtual.tarefasFeitas[tarefaAtualModal.key]) {
+  mostrarToast('✅ Esta tarefa já foi aprovada!', 'sucesso'); fecharModal(); return;
+}
+const i = $('fotoComprovanteModal');
+const btn = document.querySelector('.botao-comprovante');
+if(!i?.files?.[0]) { mostrarToast('📷 Escolha uma foto primeiro!', 'erro'); return; }
+const textoOriginal = btn ? btn.innerHTML : '';
+if(btn){ btn.disabled = true; btn.innerHTML = '<span class="loading"></span> ENVIANDO...'; }
+try {
+  // Comprime a foto pra no maximo 1024px em JPEG 70% (fica ~100-200KB, nao da erro no Firebase)
+  const fotoComprimida = await comprimirImagem(i.files[0], 1024, 0.7);
+  await db.ref('provas').push({
+    uid: usuarioAtual.id, nome: usuarioAtual.nome,
+    tarefaId: tarefaAtualModal.key, pontos: Number(tarefaAtualModal.pontos)||0,
+    urlFoto: fotoComprimida, status: 'pendente',
+    data: firebase.database.ServerValue.TIMESTAMP
+  });
+  fecharModal();
+  mostrarToast('✅ Comprovante enviado! Aguarde aprovação', 'sucesso');
+} catch(e) {
+  console.error('Erro envio comprovante:', e);
+  mostrarToast('❌ Erro ao enviar: ' + (e.message || 'tente novamente'), 'erro');
+} finally {
+  if(btn){ btn.disabled = false; btn.innerHTML = textoOriginal; }
+}
+}
+
+// ============================================================
+// 📜 MINHAS TAREFAS - historico permanente do usuario
+// ============================================================
+function mudarAbaTarefas(aba) {
+  registrarAtividade();
+  const botoes = document.querySelectorAll('.aba-tarefa');
+  botoes.forEach(b => b.classList.remove('ativa'));
+  if(aba === 'tarefas') {
+    botoes[0].classList.add('ativa');
+    $('viewTarefas').classList.remove('esconder');
+    $('viewMinhasTarefas').classList.add('esconder');
+  } else {
+    botoes[1].classList.add('ativa');
+    $('viewTarefas').classList.add('esconder');
+    $('viewMinhasTarefas').classList.remove('esconder');
+    carregarMinhasTarefas();
+  }
+}
+async function carregarMinhasTarefas() {
+  if(!usuarioAtual) return;
+  try {
+    const [snapProvas, snapTarefas] = await Promise.all([
+      db.ref('provas').orderByChild('uid').equalTo(usuarioAtual.id).once('value'),
+      db.ref('tarefas').once('value')
+    ]);
+    const tarefasMap = {};
+    snapTarefas.forEach(t => { tarefasMap[t.key] = t.val() || {}; });
+    const arr = [];
+    snapProvas.forEach(p => { arr.push({ key: p.key, ...p.val() }); });
+    arr.sort((a,b) => (Number(b.data)||0) - (Number(a.data)||0)); // mais novas primeiro
+    let concluidas = 0;
+    arr.forEach(p => { if(p.status === 'aprovado') concluidas++; });
+    if($('qtdConcluidas')) $('qtdConcluidas').textContent = concluidas;
+    renderizarMinhasTarefas(arr, tarefasMap);
+  } catch(e) { console.error('Erro minhas tarefas:', e); }
+}
+function renderizarMinhasTarefas(arr, tarefasMap) {
+  const lista = $('listaMinhasTarefas');
+  if(!lista) return;
+  if(arr.length === 0) { lista.innerHTML = '<div class="sem-dados">Você ainda não fez nenhuma tarefa 🎯</div>'; return; }
+  let html = '';
+  arr.forEach(p => {
+    const t = tarefasMap[p.tarefaId] || {};
+    const nome = t.titulo || 'Tarefa removida';
+    const pts = Number(p.pontos) || Number(t.pontos) || 0;
+    const status = p.status || 'pendente';
+    let badge = '', infoPts = '', motivoHtml = '';
+    if(status === 'aprovado') {
+      badge = '<span class="status-badge status-aprovado">✅ Aprovada</span>';
+      infoPts = `<div class="hist-pts">+${pts} pontos · = R$ ${real(pts/P_POR_REAL)}</div>`;
+    } else if(status === 'rejeitado') {
+      badge = '<span class="status-badge status-rejeitado">❌ Rejeitada</span>';
+      motivoHtml = p.motivo ? `<div class="hist-motivo">❌ Motivo: ${esc(p.motivo)}</div>` : '';
+    } else {
+      badge = '<span class="status-badge status-pendente">⏳ Aguardando</span>';
+    }
+    html += `
+    <div class="hist-card">
+      <div class="hist-topo">
+        <div class="hist-nome">${esc(nome)}</div>
+        ${badge}
+      </div>
+      <div class="hist-data">📅 ${dataHoraFormatada(p.data)}</div>
+      ${infoPts}
+      ${motivoHtml}
+    </div>`;
+  });
+  lista.innerHTML = html;
+}
+// ============================================================
+// SAQUES
+// ============================================================
+function renderizarSaquesUsuario(snap) {
+  const lista = $('listaSaques');
+  if(!lista) return;
+  
+  if(!snap.exists()) { lista.innerHTML = '<div class="sem-dados">Nenhum saque solicitado ainda 💸</div>'; return; }
+  
+  const arr = [];
+  snap.forEach(s => { try { arr.push({ key: s.key, ...s.val() }); } catch(e){} });
+  arr.sort((a,b) => (Number(a.data)||0)-(Number(b.data)||0)); // 📅 Mais antigo em cima
+  
+  const sm = { pendente:['⏳ PENDENTE','pendente'], aprovado:['✅ APROVADO','aprovado'], rejeitado:['❌ REJEITADO','rejeitado'] };
+  let html = '';
+  arr.forEach(s => {
+    try {
+    const v = Number(s.valor)||0;
+    const st = sm[s.status] || sm.pendente;
+    const motivoRej = (s.status==='rejeitado' && s.motivo) ? `<div style="margin-top:6px;background:#fee2e2;color:#991b1b;padding:8px 10px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid #fca5a5;">❌ Motivo: ${s.motivo}</div>` : '';
+    const podeExcluir = (s.status!=='pendente');
+    const btnExcluir = podeExcluir ? `<button onclick="excluirSaque('${s.key}')" style="margin-top:8px;width:100%;padding:8px;border:none;border-radius:8px;background:#f3f4f6;color:#6b7280;font-weight:600;font-size:12px;cursor:pointer;">🗑️ Excluir histórico</button>` : '';
+    html += `
+    <div class="item-lista">
+      <div style="font-weight:700;color:#0369a1;font-size:16px;">💵 R$ ${real(v)}</div>
+      <div class="dados-prova">📅 ${dataHoraFormatada(s.data)}</div>
+      <div class="dados-prova">🔑 (${s.tipoChave||'—'}) ${s.chavePix||'—'}</div>
+      <div class="${st[1]}" style="margin-top:8px;padding:10px;text-align:center;font-weight:700;">${st[0]}</div>
+      ${motivoRej}
+      ${btnExcluir}
+    </div>
+    `;
+    } catch(e){}
+  });
+  if(arr.length===0) html = '<div class="sem-dados">Nenhum saque solicitado ainda 💸</div>';
+  lista.innerHTML = html;
+}
+
+function carregarSaquesUsuario() {
+  if(!usuarioAtual) return;
+  db.ref('saques').orderByChild('uid').equalTo(usuarioAtual.id).once('value').then(snap => {
+    renderizarSaquesUsuario(snap);
+  });
+}
+
+function alternarChaves() { $('opcoesChave')?.classList.toggle('mostrar'); }
+function definirChave(t) {
+tipoChave = t;
+$('textoChave').textContent = t.toUpperCase();
+$('opcoesChave')?.classList.remove('mostrar');
+document.querySelectorAll('.btn-chave').forEach(b => b.classList.remove('ativo'));
+if(event?.target) event.target.classList.add('ativo');
+salvarDadosSaqueTemp();
+}
+function salvarDadosSaqueTemp() {
+if(!usuarioAtual) return;
+const n = $('nomeSaque')?.value?.trim() || '';
+const c = $('chavePixValor')?.value?.trim() || '';
+if(n || tipoChave || c) localStorage.setItem('dadosSaque_' + usuarioAtual.id, JSON.stringify({ nome:n, tipoChave, chavePix:c }));
+}
+function carregarDadosSaqueSalvos() {
+if(!usuarioAtual) return;
+const s = localStorage.getItem('dadosSaque_' + usuarioAtual.id);
+if(s) { try { const d=JSON.parse(s); if(d.nome)$('nomeSaque').value=d.nome; if(d.tipoChave){tipoChave=d.tipoChave;$('textoChave').textContent=tipoChave.toUpperCase();} if(d.chavePix)$('chavePixValor').value=d.chavePix; } catch(e){} }
+}
+async function apagarChave() {
+if(!confirm('Apagar dados salvos?')) return;
+if(usuarioAtual) localStorage.removeItem('dadosSaque_' + usuarioAtual.id);
+$('nomeSaque').value=''; $('chavePixValor').value=''; tipoChave=''; $('textoChave').textContent='Selecione';
+document.querySelectorAll('.btn-chave').forEach(b => b.classList.remove('ativo'));
+mostrarToast('✅ Dados apagados!', 'sucesso');
+}
+function atualizarSaldoSaque() {
+const p = Number($('saldoUsuario')?.textContent) || 0;
+$('saldoSacar').textContent = p;
+$('valorRealSacar').textContent = real(p / P_POR_REAL);
+}
+async function solicitarSaque() {
+const nome = $('nomeSaque')?.value?.trim();
+const valor = Number($('valorSaque')?.value);
+const chave = $('chavePixValor')?.value?.trim();
+const er = $('erroSaque'), ok = $('sucessoSaque');
+er?.classList.remove('mostrar'); ok?.classList.remove('mostrar');
+if(!nomeValido(nome)) { er.textContent='⚠️ Nome completo!'; er?.classList.add('mostrar'); return; }
+if(!valor || valor < SAQUE_MIN_REAL) { er.textContent='⚠️ Mínimo R$ 10!'; er?.classList.add('mostrar'); return; }
+if(!tipoChave) { er.textContent='⚠️ Tipo de chave!'; er?.classList.add('mostrar'); return; }
+if(!chave) { er.textContent='⚠️ Chave PIX!'; er?.classList.add('mostrar'); return; }
+const pts = valor * P_POR_REAL;
+const atuais = Number($('saldoSacar')?.textContent) || 0;
+if(atuais < pts) { er.textContent='⚠️ Saldo insuficiente!'; er?.classList.add('mostrar'); return; }
+if(!confirm('Sacar R$ ' + real(valor) + '?')) return;
+try {
+await db.ref('usuarios/' + usuarioAtual.id + '/pontos').transaction(v => {
+const s = Number(v) || 0;
+if(s < pts) return;
+return s - pts;
+});
+await db.ref('saques').push({
+uid: usuarioAtual.id, nome, valor, tipoChave, chavePix: chave,
+status: 'pendente', data: firebase.database.ServerValue.TIMESTAMP
+});
+if(usuarioAtual) localStorage.setItem('dadosSaque_' + usuarioAtual.id, JSON.stringify({ nome, tipoChave, chavePix: chave }));
+ok.textContent='✅ Solicitado! Aguarde ⏳'; ok?.classList.add('mostrar');
+// 🕐 Some com a mensagem depois de 8 segundos
+setTimeout(() => { ok?.classList.remove('mostrar'); ok.textContent=''; }, 8000);
+$('valorSaque').value='';
+carregarSaquesUsuario(); // 🔄 Atualiza "MEUS SAQUES" na hora!
+} catch(e) { er.textContent='❌ Erro: '+e.message; er?.classList.add('mostrar'); }
+}
+
+function copiarLink() {
+navigator.clipboard.writeText($('linkConvite').textContent)
+.then(() => mostrarToast('✅ Link copiado!', 'sucesso'))
+.catch(() => alert('Copie: ' + $('linkConvite').textContent));
+}
+
+// ============================================================
+// BUSCAR USUÁRIOS
+// ============================================================
+function buscarUsuario() {
+const t = $('campoBusca')?.value?.trim()?.toLowerCase();
+const r = $('resultadoBusca');
+if(!r) return;
+r.innerHTML = '';
+if(!t || t.length < 2) return;
+db.ref('usuarios').once('value').then(snap => {
+const enc = [];
+snap.forEach(u => {
+const d = u.val() || {};
+if((d.nome||'').toLowerCase().includes(t) || (d.contato||'').toLowerCase().includes(t))
+enc.push({ chave: u.key, ...d });
+});
+if(enc.length === 0) { r.innerHTML = '<div class="sem-dados">Nada encontrado</div>'; return; }
+let html = '';
+enc.forEach(u => {
+const pts = Number(u.pontos)||0;
+const ad = u.admin === true || u.admin === 'true';
+const dono = ehDono(u.contato);
+let ba = '';
+if(!dono) ba = `<button class="btn btn-admin-toggle" onclick="toggleAdmin('${u.chave}',${ad})">${ad?'👑 REMOVER ADMIN':'👑 TORNAR ADMIN'}</button>`;
+else ba = `<div style="background:#fef3c7;color:#92400e;padding:10px;border-radius:10px;text-align:center;font-weight:700;margin-top:8px;">👑 DONO - INTOCÁVEL</div>`;
+html += `
+<div class="item-lista">
+<div style="font-weight:700;color:#0369a1;">${u.nome||'—'} ${dono?'<span class="dono-tag">👑 DONO</span>':(ad?'<span style="color:#7c3aed;">👑 ADMIN</span>':'')}</div>
+<div class="dados-prova">📧 ${u.contato||'—'}</div>
+<div class="dados-prova">💰 ${pts} pts = R$ ${real(pts/P_POR_REAL)}</div>
+<div style="display:flex;gap:8px;margin-top:10px;">
+<button class="btn btn-v" style="flex:1;" onclick="addPts('${u.chave}',${pts})">➕ Add</button>
+<button class="btn btn-x" style="flex:1;" onclick="remPts('${u.chave}',${pts})">➖ Rem</button>
+</div>
+<button class="btn" style="background:#e5e7eb;color:#374151;" onclick="defPts('${u.chave}')">✏️ Definir</button>
+${ba}
+</div>
+`;
+});
+r.innerHTML = html;
+});
+}
+async function toggleAdmin(uid, ad) {
+try {
+const s = await db.ref('usuarios/' + uid).once('value');
+if(ehDono((s.val()||{}).contato)) { mostrarToast('❌ DONO! Não pode!', 'erro'); return; }
+if(!confirm((ad?'Remover':'Tornar')+' admin?')) return;
+await db.ref('usuarios/' + uid + '/admin').set(!ad);
+mostrarToast('✅ Feito!', 'sucesso');
+buscarUsuario();
+} catch(e) { mostrarToast('❌ Erro: '+e.message, 'erro'); }
+}
+async function addPts(uid, at) { const q=prompt('Atuais: '+at+'\nAdicionar:'); const n=parseInt(q); if(!n||n<=0) return; try{await db.ref('usuarios/'+uid+'/pontos').transaction(v=>(v||0)+n);mostrarToast('✅ +'+n,'sucesso');buscarUsuario();}catch(e){mostrarToast('❌ Erro','erro');} }
+async function remPts(uid, at) { const q=prompt('Atuais: '+at+'\nRemover:'); const n=parseInt(q); if(!n||n<=0) return; try{await db.ref('usuarios/'+uid+'/pontos').transaction(v=>Math.max(0,(v||0)-n));mostrarToast('✅ -'+n,'sucesso');buscarUsuario();}catch(e){mostrarToast('❌ Erro','erro');} }
+async function defPts(uid) { const q=prompt('Definir saldo:'); const n=parseInt(q); if(isNaN(n)||n<0) return; try{await db.ref('usuarios/'+uid+'/pontos').set(n);mostrarToast('✅ '+n,'sucesso');buscarUsuario();}catch(e){mostrarToast('❌ Erro','erro');} }
+
+// ============================================================
+// PAINEL GERAL
+// ============================================================
+function carregarPainel() {
+if(!eAdmin()) return;
+db.ref('usuarios').once('value').then(s => {
+let t=0, p=0;
+s.forEach(u => { t++; p += Number(u.val().pontos)||0; });
+if($('totalUsuarios')) $('totalUsuarios').textContent = t;
+if($('pontosEmCirculacao')) $('pontosEmCirculacao').textContent = p;
+});
+db.ref('status').once('value').then(s => {
+let o=0, a=Date.now();
+s.forEach(x => { const d=x.val()||{}; if(d.online && (a-(d.ultimaVez||0))<TEMPO_OFFLINE) o++; });
+if($('qtdOnline')) $('qtdOnline').textContent = o;
+});
+db.ref('saques').once('value').then(s => {
+let pg=0, pd=0;
+s.forEach(x => { const d=x.val()||{}; if(d.status==='aprovado') pg+=Number(d.valor)||0; if(d.status==='pendente') pd++; });
+if($('valorTotalPago')) $('valorTotalPago').textContent = 'R$ ' + real(pg);
+if($('saquesPendentes')) $('saquesPendentes').textContent = pd;
+});
+db.ref('provas').once('value').then(s => { 
+let pc = 0;
+s.forEach(function(x){ try { if((x.val()||{}).status === 'pendente') pc++; } catch(e){} });
+if($('provasPendentes')) $('provasPendentes').textContent = pc; 
+});
+}
+
+// ============================================================
+// LISTA DE USUÁRIOS (ao vivo — atualiza sozinho quando cadastra novo)
+// ============================================================
+function carregarUsuarios() {
+if(!eAdmin()) return;
+// Listener AO VIVO que atualiza a lista em tempo real.
+// Renderização robusta: se um usuário tiver dado estranho, os outros continuam aparecendo.
+ativarListenerUnico('usuarios_lista', db.ref('usuarios'), (snap) => {
+  db.ref('status').once('value').then(ss => {
+    const lista = $('listaPessoas');
+    if(!lista) return;
+    if(!snap.exists()) { lista.innerHTML = '<div class="sem-dados">Nenhum usuário cadastrado ainda</div>'; return; }
+    const sm = {};
+    try { ss.forEach(x => { try { sm[x.key] = x.val()||{}; } catch(e){} }); } catch(e){}
+    const arr = [];
+    snap.forEach(function(u){ try { arr.push(Object.assign({ chave: u.key }, u.val()||{})); } catch(e){ console.warn('Erro usuario:', e); } });
+    arr.sort(function(a,b){ return (Number(b.pontos)||0)-(Number(a.pontos)||0); });
+    console.log('👥 Usuários carregados:', arr.length);
+    let html = '';
+    const agora = Date.now();
+    for(let i = 0; i < arr.length; i++) {
+      try {
+        const p = arr[i];
+        const pts = Number(p.pontos)||0;
+        const st = sm[p.chave] || {};
+        const on = !!(st.online && (agora-(Number(st.ultimaVez)||0))<TEMPO_OFFLINE);
+        let dono = false;
+        try { dono = ehDono(p.contato); } catch(e){ dono = false; }
+        const adminTag = (p.admin === true || p.admin === 'true') ? '👑' : '';
+        const nome = esc(String(p.nome||'—'));
+        const contato = esc(String(p.contato||'—'));
+        const tagHtml = dono ? '<span class="dono-tag">👑 DONO</span>' : adminTag;
+        const onOff = on ? '🟢 Online agora' : '⚪ Offline';
+        html += '<div class="item-lista">'
+          + '<div style="font-weight:700;color:#0369a1;">' + nome + ' ' + tagHtml + ' <span class="online-indicador ' + (on?'ativo':'') + '" style="margin-left:8px;"></span></div>'
+          + '<div class="dados-prova">📧 ' + contato + '</div>'
+          + '<div class="dados-prova">💰 ' + pts + ' pts = R$ ' + real(pts/P_POR_REAL) + '</div>'
+          + '<div class="hora-prova">' + onOff + '</div>'
+          + '</div>';
+      } catch(e) {
+        console.warn('Erro ao montar usuário:', e);
+        html += '<div class="item-lista" style="color:#ef4444;">⚠️ Usuário com dados inválidos</div>';
+      }
+    }
+    lista.innerHTML = html;
+  }).catch(function(err){
+    console.error('Erro status:', err);
+  });
+});
+}
+
+// ============================================================
+// ✅✅✅ FUNÇÕES DE TAREFAS - MODO PRO ✅✅✅
+// ============================================================
+
+function previewFotoCard() {
+const url = $('fotoTarefa')?.value?.trim();
+const img = $('previewCard');
+if(!img) return;
+if(url && urlValida(url)) {
+img.src = url;
+img.classList.remove('esconder');
+img.onerror = () => img.classList.add('esconder');
+} else {
+img.classList.add('esconder');
+}
+}
+
+function previewFotoModal() {
+const url = $('fotoExemploModal')?.value?.trim();
+const img = $('previewModal');
+if(!img) return;
+if(url && urlValida(url)) {
+img.src = url;
+img.classList.remove('esconder');
+img.onerror = () => img.classList.add('esconder');
+} else {
+img.classList.add('esconder');
+}
+}
+
+function mostrarFeedback(qual, texto, tipo) {
+const el = $('feedback' + qual);
+if(!el) return;
+el.textContent = texto;
+el.className = tipo === 'ok' ? 'msg-ok mostrar' : (tipo === 'erro' ? 'msg-erro mostrar' : 'msg-info mostrar');
+setTimeout(() => el.classList.remove('mostrar'), 4000);
+}
+
+// ✅ SALVAR CARD - CRIAR OU EDITAR
+async function salvarTarefaCard() {
+if(!eAdmin()) { mostrarToast('❌ Você não é admin!', 'erro'); return; }
+
+const btn = $('btnSalvarCard');
+const titulo = $('tituloTarefa')?.value?.trim();
+const foto = $('fotoTarefa')?.value?.trim() || '';
+const nivel = $('nivelTarefa')?.value || 'Fácil';
+const pontos = Number($('pontosTarefa')?.value);
+const descricao = $('descricaoTarefa')?.value?.trim() || '';
+
+if(!titulo) { mostrarFeedback('Card', '⚠️ Digite o NOME da tarefa!', 'erro'); return; }
+if(titulo.length < 3) { mostrarFeedback('Card', '⚠️ Nome muito curto!', 'erro'); return; }
+if(!pontos || pontos <= 0) { mostrarFeedback('Card', '⚠️ Digite os PONTOS (maior que zero)!', 'erro'); return; }
+if(foto && !urlValida(foto)) { mostrarFeedback('Card', '⚠️ URL da foto inválida!', 'erro'); return; }
+
+btn.disabled = true;
+const textoOriginal = btn.innerHTML;
+btn.innerHTML = '<span class="loading"></span> SALVANDO...';
+
+try {
+if(editandoCardId) {
+// EDITANDO
+console.log('📝 EDITANDO tarefa:', editandoCardId);
+await db.ref('tarefas/' + editandoCardId).update({ titulo, foto, nivel, pontos, descricao });
+mostrarFeedback('Card', '✅ TAREFA ATUALIZADA! Apareceu atualizada na lista de usuários!', 'ok');
+mostrarToast('✅ Tarefa atualizada!', 'sucesso');
+cancelarEdicaoCard();
+} else {
+// CRIANDO NOVA
+console.log('➕ CRIANDO nova tarefa:', titulo);
+const novaRef = db.ref('tarefas').push();
+await novaRef.set({
+titulo, foto, nivel, pontos, descricao,
+link: '', regras: '', fotoExemplo: '',
+ativa: true,
+criadoEm: firebase.database.ServerValue.TIMESTAMP
+});
+console.log('✅ Tarefa criada - ID:', novaRef.key);
+mostrarFeedback('Card', '✅ TAREFA ADICIONADA! Já apareceu na lista "TAREFAS DISPONÍVEIS" dos usuários! 🎉 Vá em "🎯 DETALHES DA TAREFA" para configurar regras, link e foto.', 'ok');
+mostrarToast('✅ Tarefa adicionada com sucesso!', 'sucesso');
+limparFormCard();
+}
+// 🔄 Atualiza a lista "SUAS TAREFAS" logo abaixo NA HORA (antes dependia só do listener e às vezes não atualizava)
+carregarListaTarefasAdmin();
+} catch(e) {
+console.error('❌ ERRO:', e);
+mostrarFeedback('Card', '❌ ERRO: ' + e.message, 'erro');
+mostrarToast('❌ Erro: ' + e.message, 'erro');
+} finally {
+btn.disabled = false;
+btn.innerHTML = textoOriginal;
+}
+}
+
+// ✅ EDITAR TAREFA
+async function editarTarefaCard(tid) {
+if(!eAdmin()) { mostrarToast('❌ Não é admin!', 'erro'); return; }
+try {
+console.log('📋 Carregando para editar:', tid);
+const snap = await db.ref('tarefas/' + tid).once('value');
+const d = snap.val() || {};
+
+$('tituloTarefa').value = d.titulo || '';
+$('fotoTarefa').value = d.foto || '';
+$('nivelTarefa').value = d.nivel || 'Fácil';
+$('pontosTarefa').value = d.pontos || '';
+$('descricaoTarefa').value = d.descricao || '';
+
+previewFotoCard();
+
+editandoCardId = tid;
+$('btnSalvarCard').textContent = '💾 ATUALIZAR TAREFA';
+$('btnCancelarCard').classList.remove('esconder');
+$('avisoEdicaoCard').classList.remove('esconder');
+
+window.scrollTo({ top: 0, behavior: 'smooth' });
+mostrarToast('📝 Modo edição ativado!', 'info');
+} catch(e) {
+console.error('❌ ERRO:', e);
+mostrarToast('❌ Erro: ' + e.message, 'erro');
+}
+}
+
+// ✅ CANCELAR EDIÇÃO
+function cancelarEdicaoCard() {
+editandoCardId = null;
+limparFormCard();
+$('btnSalvarCard').textContent = '✅ ADICIONAR TAREFA';
+$('btnCancelarCard').classList.add('esconder');
+$('avisoEdicaoCard').classList.add('esconder');
+$('previewCard')?.classList.add('esconder');
+}
+
+// ✅ LIMPAR FORMULÁRIO
+function limparFormCard() {
+$('tituloTarefa').value = '';
+$('fotoTarefa').value = '';
+$('nivelTarefa').value = 'Fácil';
+$('pontosTarefa').value = '';
+$('descricaoTarefa').value = '';
+}
+
+// ✅ EXCLUIR TAREFA
+async function excluirTarefa(tid, nome) {
+if(!eAdmin()) { mostrarToast('❌ Você não é admin!', 'erro'); return; }
+if(!tid) { mostrarToast('❌ ID inválido!', 'erro'); return; }
+
+const confirma = confirm(
+'🗑️ CONFIRMAR EXCLUSÃO?\n\n' +
+'📌 Tarefa: "' + (nome || 'Sem nome') + '"\n\n' +
+'⚠️ Ela será removida de TODAS as telas automaticamente!\n' +
+'⚠️ Essa ação NÃO pode ser desfeita!'
+);
+if(!confirma) return;
+
+try {
+console.log('🗑️ EXCLUINDO tarefa:', tid);
+await db.ref('tarefas/' + tid).remove();
+console.log('✅ Tarefa excluída:', tid);
+mostrarToast('✅ TAREFA EXCLUÍDA! Removida de todas as telas.', 'sucesso');
+// 🔄 Atualiza as listas na hora
+carregarListaTarefasAdmin();
+carregarListaTarefasModal();
+} catch(e) {
+console.error('❌ ERRO:', e);
+mostrarToast('❌ ERRO: ' + e.message, 'erro');
+}
+}
+
+// ✅ CARREGAR LISTA NA TELA 1 — ROBUSTO com tratamento de erro e log
+// 🔧 DEBUG VISÍVEL: mostra status do admin e quantas tarefas achou no banco
+function mostrarDebug(listaId, texto, cor) {
+  const el = document.getElementById('debug_' + listaId);
+  if(!el) return;
+  el.textContent = texto;
+  el.style.color = cor || '#0369a1';
+  el.style.display = 'block';
+}
+function carregarListaTarefasAdmin() {
+  const lista = $('listaTarefasAdmin');
+  if(!lista) { console.error('listaTarefasAdmin não encontrado!'); return; }
+  // Mostra status de admin na hora (visível na tela)
+  mostrarDebug('listaTarefasAdmin', '🔍 Verificando... admin=' + eAdmin() + ' | cache=' + adminCache, '#7c3aed');
+  if(!eAdmin()) {
+    lista.innerHTML = '<div class="sem-dados" style="color:#ef4444;">❌ NÃO É ADMIN! Saia e entre com a conta de admin.<br>admin=' + eAdmin() + ' cache=' + adminCache + '</div>';
+    return;
+  }
+  lista.innerHTML = '<div class="sem-dados">🔄 Carregando tarefas do banco...</div>';
+  try {
+    db.ref('tarefas').once('value').then(function(snap) {
+      const qtd = snap.numChildren();
+      mostrarDebug('listaTarefasAdmin', '✅ Banco respondeu! ' + qtd + ' tarefa(s) encontrada(s)', '#059669');
+      if(qtd === 0) {
+        lista.innerHTML = '<div class="sem-dados">📭 Nenhuma tarefa cadastrada. Crie a primeira acima! 👆</div>';
+        return;
+      }
+      // Monta lista do jeito MAIS SIMPLES possível — sem funções, sem frescura
+      const arr = [];
+      snap.forEach(function(t) { arr.push({ key: t.key, dados: t.val() }); });
+      ordenarTarefas(arr);
+      let html = '';
+      for(let i = 0; i < arr.length; i++) {
+        try {
+          const t = arr[i];
+          const d = t.dados || {};
+          const pts = Number(d.pontos) || 0;
+          const tit = String(d.titulo || 'Sem nome');
+          const niv = String(d.nivel || 'Fácil');
+          const desc = String(d.descricao || '');
+          const chave = String(t.key || '');
+          html += '<div class="item-lista">'
+            + '<div style="font-weight:700;color:#0369a1;font-size:16px;">' + esc(tit) + ' <span style="font-size:12px;color:#6b7280;">(' + esc(niv) + ')</span></div>'
+            + '<div class="dados-prova">💰 ' + pts + ' pts = R$ ' + real(pts/P_POR_REAL) + '</div>'
+            + (desc ? '<div class="dados-prova">📝 ' + esc(desc) + '</div>' : '')
+            + '<div class="botoes-duplos">'
+            + '<button class="btn-editar" onclick="editarTarefaCard(\'' + chave + '\')">✏️ EDITAR</button>'
+            + '<button class="btn-excluir" onclick="excluirTarefa(\'' + chave + '\',\'tarefa\')">🗑️ EXCLUIR</button>'
+            + '</div></div>';
+        } catch(e) {
+          html += '<div class="item-lista" style="border-color:#ef4444;color:#ef4444;">⚠️ Erro em uma tarefa: ' + e.message + '</div>';
+        }
+      }
+      lista.innerHTML = html;
+      mostrarDebug('listaTarefasAdmin', '✅ ' + arr.length + ' tarefa(s) exibida(s) com sucesso!', '#059669');
+    }).catch(function(err) {
+      console.error('Firebase erro:', err);
+      lista.innerHTML = '<div class="sem-dados" style="color:#ef4444;">❌ ERRO NO BANCO: ' + err.message + '<br><button class="btn btn-v" style="margin-top:10px;" onclick="carregarListaTarefasAdmin()">🔄 Tentar de novo</button></div>';
+      alert('ERRO ao carregar tarefas: ' + err.message);
+    });
+  } catch(e) {
+    lista.innerHTML = '<div class="sem-dados" style="color:#ef4444;">❌ ERRO: ' + e.message + '</div>';
+    alert('ERRO: ' + e.message);
+  }
+}
+
+// ✅ CARREGAR SELECT NA TELA 2 — robusto
+async function carregarSelectModal() {
+// O listener em tempo real (tarefas_global) já mantém o select atualizado sozinho.
+// Esta função é apenas um garantia extra de carregamento inicial.
+if(!eAdmin()) return;
+const sel = $('selectTarefaModal');
+if(!sel) return;
+try {
+const snap = await db.ref('tarefas').once('value');
+atualizarSelectTarefas(snap);
+} catch(e) { console.warn('Erro ao carregar select de tarefas:', e); }
+}
+
+// ✅ CARREGAR DADOS DO MODAL
+async function carregarDadosModal() {
+const tid = $('selectTarefaModal')?.value;
+tarefaSelecionadaId = tid;
+if(!tid) { $('dadosModalArea')?.classList.add('esconder'); return; }
+try {
+const snap = await db.ref('tarefas/' + tid).once('value');
+const d = snap.val() || {};
+$('linkTarefaModal').value = d.link || '';
+$('regrasTarefaModal').value = d.regras || '';
+$('fotoExemploModal').value = d.fotoExemplo || '';
+previewFotoModal();
+$('dadosModalArea')?.classList.remove('esconder');
+} catch(e) { mostrarToast('❌ Erro: ' + e.message, 'erro'); }
+}
+
+// ✅ SALVAR DETALHES DO MODAL
+async function salvarTarefaModal() {
+if(!eAdmin()) { mostrarToast('❌ Não é admin!', 'erro'); return; }
+if(!tarefaSelecionadaId) { mostrarFeedback('Modal', '⚠️ Selecione uma tarefa primeiro!', 'erro'); return; }
+
+const btn = $('btnSalvarModal');
+const link = $('linkTarefaModal')?.value?.trim() || '';
+const regras = $('regrasTarefaModal')?.value?.trim() || '';
+const fotoExemplo = $('fotoExemploModal')?.value?.trim() || '';
+
+if(link && !urlValida(link)) { mostrarFeedback('Modal', '⚠️ URL do link inválida!', 'erro'); return; }
+if(fotoExemplo && !urlValida(fotoExemplo)) { mostrarFeedback('Modal', '⚠️ URL da foto inválida!', 'erro'); return; }
+
+btn.disabled = true;
+const textoOriginal = btn.innerHTML;
+btn.innerHTML = '<span class="loading"></span> SALVANDO...';
+
+try {
+console.log('💾 Salvando detalhes:', tarefaSelecionadaId);
+await db.ref('tarefas/' + tarefaSelecionadaId).update({ link, regras, fotoExemplo });
+mostrarFeedback('Modal', '✅ DETALHES SALVOS! Já atualizado para todos os usuários.', 'ok');
+mostrarToast('✅ Detalhes salvos!', 'sucesso');
+// 🔄 Atualiza a lista debaixo na hora
+carregarListaTarefasModal();
+} catch(e) {
+console.error('❌ ERRO:', e);
+mostrarFeedback('Modal', '❌ ERRO: ' + e.message, 'erro');
+mostrarToast('❌ Erro: ' + e.message, 'erro');
+} finally {
+btn.disabled = false;
+btn.innerHTML = textoOriginal;
+}
+}
+
+// ✅ CARREGAR LISTA NA TELA 2 — robusto, ordena no cliente
+// ✅ CARREGAR LISTA NA TELA 2 — ROBUSTO com tratamento de erro
+function carregarListaTarefasModal() {
+const lista = $('listaTarefasModal');
+if(!lista) return;
+mostrarDebug('listaTarefasModal', '🔍 Verificando... admin=' + eAdmin() + ' | cache=' + adminCache, '#7c3aed');
+if(!eAdmin()) {
+  lista.innerHTML = '<div class="sem-dados" style="color:#ef4444;">❌ NÃO É ADMIN!</div>';
+  return;
+}
+lista.innerHTML = '<div class="sem-dados">🔄 Carregando...</div>';
+db.ref('tarefas').once('value').then(function(snap) {
+  const qtd = snap.numChildren();
+  mostrarDebug('listaTarefasModal', '✅ Banco respondeu! ' + qtd + ' tarefa(s)', '#059669');
+  if(qtd === 0) { lista.innerHTML = '<div class="sem-dados">📭 Nenhuma tarefa</div>'; return; }
+  const arr = [];
+  snap.forEach(function(t) { arr.push({ key: t.key, dados: t.val() }); });
+  ordenarTarefas(arr);
+  let html = '';
+  for(let i = 0; i < arr.length; i++) {
+    try {
+      const d = arr[i].dados || {};
+      const pts = Number(d.pontos)||0;
+      html += '<div class="item-lista">'
+        + '<div style="font-weight:700;color:#0369a1;">' + esc(String(d.titulo||'—')) + ' <span style="font-size:12px;color:#6b7280;">(' + esc(String(d.nivel||'Fácil')) + ')</span></div>'
+        + '<div class="dados-prova">💰 ' + pts + ' pts = R$ ' + real(pts/P_POR_REAL) + '</div>'
+        + '<button class="btn-excluir" onclick="excluirTarefa(\'' + String(arr[i].key||'') + '\',\'tarefa\')">🗑️ EXCLUIR TAREFA</button>'
+        + '</div>';
+    } catch(e) {
+      html += '<div class="item-lista" style="color:#ef4444;">⚠️ Erro: ' + e.message + '</div>';
+    }
+  }
+  lista.innerHTML = html;
+}).catch(function(err) {
+  lista.innerHTML = '<div class="sem-dados" style="color:#ef4444;">❌ ERRO: ' + err.message + '</div>';
+  alert('ERRO ao carregar: ' + err.message);
+});
+}
+
+// ============================================================
+// ANÁLISE DE PROVAS
+// ============================================================
+function carregarProvasPendentes() {
+if(!eAdmin()) return;
+const lista = $('listaAnalise');
+if(!lista) return;
+lista.innerHTML = '<div class="sem-dados">🔄 Carregando...</div>';
+// 🔴 NÃO usa orderByChild (pode falhar sem .indexOn no Firebase e voltar só 1).
+// Puxa TUDO e filtra no cliente, igual à tela de saques que funciona.
+db.ref('provas').once('value').then(function(snap) {
+  if(!snap.exists()) { lista.innerHTML = '<div class="sem-dados">✅ Nenhuma prova pendente!</div>'; return; }
+  const arr = [];
+  snap.forEach(function(p){
+    try {
+      const v = p.val() || {};
+      arr.push(Object.assign({ chave: p.key }, v));
+    } catch(e) { console.warn('Erro ao ler prova:', e); }
+  });
+  // Filtra só as pendentes no cliente (mais confiável)
+  const pendentes = arr.filter(function(d){ return (d.status||'pendente') === 'pendente'; });
+  // 📅 Mais antiga em cima (ordem de aprovação)
+  pendentes.sort(function(a,b){ return (Number(a.data)||0) - (Number(b.data)||0); });
+  console.log('📥 Provas pendentes:', pendentes.length, 'de', arr.length, 'no total');
+  if(pendentes.length === 0) { lista.innerHTML = '<div class="sem-dados">✅ Nenhuma prova pendente!</div>'; return; }
+  let html = '';
+  for(let i = 0; i < pendentes.length; i++) {
+    try {
+      const d = pendentes[i];
+      const pts = Number(d.pontos)||0;
+      const nome = esc(String(d.nome||'—'));
+      const chave = String(d.chave||'').replace(/'/g,'');
+      const uid = String(d.uid||'').replace(/'/g,'');
+      const tid = String(d.tarefaId||'').replace(/'/g,'');
+      let dataTxt = '—';
+      try { if(d.data){ dataTxt = dataHoraFormatada(d.data); } } catch(e){}
+      let fotoHtml = '<div class="sem-dados">Sem foto</div>';
+      if(d.urlFoto) { fotoHtml = '<img src="' + esc(String(d.urlFoto)) + '" class="foto-prova" onerror="this.style.display=\'none\'">'; }
+      html += '<div class="item-lista">'
+        + '<div style="font-weight:700;color:#0369a1;">👤 ' + nome + '</div>'
+        + '<div class="dados-prova">💰 +' + pts + ' = R$ ' + real(pts/P_POR_REAL) + '</div>'
+        + '<div class="dados-prova">📅 ' + dataTxt + '</div>'
+        + fotoHtml
+        + '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">'
+        + '<button class="btn btn-v" style="flex:1;min-width:70px;" onclick="aprovarProva(\''+chave+'\',\''+uid+'\','+pts+',\''+tid+'\')">✅ APROVAR</button>'
+        + '<button class="btn btn-x" style="flex:1;min-width:70px;" onclick="rejeitarProva(\''+chave+'\')">❌ REJEITAR</button>'
+        + '<button style="flex:1;min-width:70px;padding:10px;border:none;border-radius:10px;background:#6b7280;color:#fff;font-weight:700;cursor:pointer;font-size:12px;" onclick="excluirProva(\''+chave+'\')">🗑️ EXCLUIR</button>'
+        + '</div>'
+        + '</div>';
+    } catch(e) {
+      console.warn('Erro ao montar prova:', e);
+      html += '<div class="item-lista" style="color:#ef4444;">⚠️ Prova com dados inválidos</div>';
+    }
+  }
+  lista.innerHTML = html;
+}).catch(function(err) {
+  console.error('Erro carregar provas:', err);
+  lista.innerHTML = '<div class="sem-dados" style="color:#ef4444;">❌ ERRO: ' + esc(String(err.message||'')) + '</div>';
+});
+}
+
+async function aprovarProva(chave, uid, pontos, tid) {
+if(!confirm('✅ APROVAR esta prova?')) return;
+try {
+await db.ref('provas/' + chave).update({ status: 'aprovado', dataAprovado: firebase.database.ServerValue.TIMESTAMP });
+await db.ref('usuarios/' + uid + '/pontos').transaction(v => (v||0) + pontos);
+// 🔒 GRAVA PERMANENTEMENTE que esta tarefa foi feita (nunca mais pode repetir!)
+if(tid) {
+await db.ref('usuarios/' + uid + '/tarefasFeitas/' + tid).set({
+  feito: true, pontos: pontos, data: firebase.database.ServerValue.TIMESTAMP
+});
+const ps = await db.ref('provas').orderByChild('uid').equalTo(uid).once('value');
+let ap = 0;
+ps.forEach(p => { if(p.val().status === 'aprovado') ap++; });
+if(ap === 1) {
+const us = await db.ref('usuarios/' + uid).once('value');
+const c = (us.val()||{}).convidou;
+if(c) {
+await db.ref('usuarios/' + c + '/pontos').transaction(v => (v||0) + P_CONVITE_ATIVO);
+await db.ref('usuarios/' + c + '/ativos').transaction(v => (v||0) + 1);
+}
+}
+}
+mostrarToast('✅ Prova aprovada! Pontos enviados!', 'sucesso');
+carregarProvasPendentes();
+} catch(e) { mostrarToast('❌ Erro: ' + e.message, 'erro'); }
+}
+async function rejeitarProva(chave) {
+if(!confirm('❌ REJEITAR esta prova?')) return;
+const motivo = prompt('Motivo da rejeição (aparece pro usuário):', 'Comprovante inválido ou não segue as regras') || 'Não segue as regras';
+try { await db.ref('provas/' + chave).update({ status: 'rejeitado', motivo: motivo, dataRejeitado: firebase.database.ServerValue.TIMESTAMP }); mostrarToast('✅ Rejeitada!', 'info'); carregarProvasPendentes(); }
+catch(e) { mostrarToast('❌ Erro: ' + e.message, 'erro'); }
+}
+async function excluirProva(chave) {
+if(!confirm('🗑️ EXCLUIR esta prova permanentemente? Não tem como desfazer!')) return;
+try { await db.ref('provas/' + chave).remove(); mostrarToast('🗑️ Prova excluída!', 'info'); carregarProvasPendentes(); }
+catch(e) { mostrarToast('❌ Erro: ' + e.message, 'erro'); }
+}
+
+// ============================================================
+// SAQUES ADMIN
+// ============================================================
+function carregarSaquesPendentes() {
+if(!eAdmin()) return;
+const lista = $('listaSaquesAdmin');
+if(!lista) return;
+db.ref('saques').once('value').then(snap => {
+lista.innerHTML = '';
+if(!snap.exists()) { lista.innerHTML = '<div class="sem-dados">Nenhum saque solicitado ainda</div>'; return; }
+const arr = [];
+snap.forEach(s => { try { const v=s.val()||{}; arr.push({ chave: s.key, ...v }); } catch(e){} });
+// 📅 MAIS ANTIGO EM CIMA (ordem de aprovação)
+arr.sort((a,b) => (Number(a.data)||0)-(Number(b.data)||0));
+let html = '';
+let qtdPendente = 0;
+arr.forEach(d => {
+try {
+const v = Number(d.valor)||0;
+const st = d.status || 'pendente';
+if(st==='pendente') qtdPendente++;
+const stTxt = st==='aprovado' ? '✅ PAGO' : (st==='rejeitado' ? '❌ REJEITADO' : '⏳ PENDENTE');
+const stCls = st==='aprovado' ? 'aprovado' : (st==='rejeitado' ? 'rejeitado' : 'pendente');
+let dataTxt = '—';
+try { if(d.data){ dataTxt = (typeof dataHoraFormatada==='function') ? dataHoraFormatada(d.data) : new Date(Number(d.data)||0).toLocaleString('pt-BR'); } } catch(e){}
+let botoes = '';
+if(st==='pendente'){
+  const uidSeguro = String(d.uid||'').replace(/'/g,"");
+  botoes = '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;"><button class="btn btn-v" style="flex:1;min-width:70px;" onclick="aprovarSaque(\''+d.chave+'\')">✅ PAGO</button><button class="btn btn-x" style="flex:1;min-width:70px;" onclick="rejeitarSaque(\''+d.chave+'\',\''+uidSeguro+'\','+v+')">❌ REJEITAR</button><button style="flex:1;min-width:70px;padding:10px;border:none;border-radius:10px;background:#6b7280;color:#fff;font-weight:700;cursor:pointer;font-size:12px;" onclick="excluirSaque(\''+d.chave+'\')">🗑️ EXCLUIR</button></div>';
+} else {
+  botoes = '<div style="margin-top:10px;"><button style="width:100%;padding:10px;border:none;border-radius:10px;background:#6b7280;color:#fff;font-weight:700;cursor:pointer;font-size:12px;" onclick="excluirSaque(\''+d.chave+'\')">🗑️ EXCLUIR (não acumular)</button></div>';
+}
+html += '<div class="item-lista" style="'+(st==='aprovado'?'opacity:0.6;':'')+'">'
++'<div style="font-weight:700;color:#0369a1;font-size:15px;">👤 '+(d.nome||'—')+'</div>'
++'<div class="dados-prova">💵 R$ '+real(v)+'</div>'
++'<div class="dados-prova">📅 '+dataTxt+'</div>'
++'<div class="dados-prova">🔑 ('+(d.tipoChave||'—')+') '+(d.chavePix||'—')+'</div>'
++'<div class="'+stCls+'" style="margin-top:8px;padding:8px;font-weight:700;text-align:center;">'+stTxt+'</div>'
++botoes
++'</div>';
+} catch(e){ /* um saque com erro não quebra os demais */ }
+});
+if(arr.length === 0) html = '<div class="sem-dados">Nenhum saque solicitado ainda</div>';
+else if(qtdPendente === 0) html = '<div class="sem-dados" style="color:#059669;">✅ Nenhum saque pendente! (todos já processados)</div>' + html;
+lista.innerHTML = html;
+}).catch(e => { lista.innerHTML = '<div class="sem-dados" style="color:#ef4444;">❌ Erro: '+e.message+'</div>'; });
+}
+
+async function aprovarSaque(chave) {
+if(!confirm('✅ MARCAR como PAGO?')) return;
+try { await db.ref('saques/' + chave).update({ status: 'aprovado' }); mostrarToast('✅ Pago!', 'sucesso'); carregarSaquesPendentes(); }
+catch(e) { mostrarToast('❌ Erro: ' + e.message, 'erro'); }
+}
+async function rejeitarSaque(chave, uid, valor) {
+if(!confirm('❌ REJEITAR? Os pontos voltam para o usuário!')) return;
+const motivo = prompt('Motivo da rejeição (aparece pro usuário):', 'Chave PIX inválida ou dados incorretos') || 'Dados inválidos';
+const pts = valor * P_POR_REAL;
+try {
+await db.ref('usuarios/' + uid + '/pontos').transaction(v => (v||0) + pts);
+await db.ref('saques/' + chave).update({ status: 'rejeitado', motivo: motivo, dataRejeitado: firebase.database.ServerValue.TIMESTAMP });
+mostrarToast('✅ Rejeitado! Pontos devolvidos!', 'info');
+carregarSaquesPendentes();
+} catch(e) { mostrarToast('❌ Erro: ' + e.message, 'erro'); }
+}
+async function excluirSaque(chave) {
+if(!confirm('🗑️ EXCLUIR este saque permanentemente? Não tem como desfazer!')) return;
+try { await db.ref('saques/' + chave).remove(); mostrarToast('🗑️ Saque excluído!', 'info'); 
+  if(eAdmin()) carregarSaquesPendentes(); 
+  if(typeof carregarSaquesUsuario === 'function') carregarSaquesUsuario();
+} catch(e) { mostrarToast('❌ Erro: ' + e.message, 'erro'); }
+}
+
+// ============================================================
+// SCROLL
+// ============================================================
+window.addEventListener('scroll', () => {
+const sub = window.scrollY < (window.ultPos || 0);
+document.querySelectorAll('.sumir-rolagem').forEach(el => {
+el.classList.toggle('escondido-menu', !sub && window.scrollY > 50);
+});
+window.ultPos = window.scrollY;
+registrarAtividade();
+});
+
+// ============================================================
+// INICIAR TUDO
+// ============================================================
+document.addEventListener('DOMContentLoaded', async () => {
+console.log('🚀 GANHA MAIS - MODO PRO CARREGADO!');
+console.log('👤 Conta do DONO:', DONO_EMAIL, '/ senha:', DONO_SENHA);
+iniciarLimpezaContinua(); // 🧹 limpeza contínua a cada 5s — contador de online sempre preciso
+await criarContaDono();
+mostrarCadastro();
+verificarEntradaSalva();
+});
+</script>
+
+<!-- ===== WIDGET FINAL: saque real 4s + arrasta pra sumir + listas ao vivo + online ===== -->
+<script>
+(function(){
+  if(typeof firebase==='undefined' || !firebase.database){ return; }
+  var db = firebase.database();
+  var box = document.getElementById('nsBox');
+  var oc  = document.getElementById('onlineCount');
+  var badge = document.getElementById('onlineBadge');
+  var telaInicio = document.getElementById('tela-inicio');
+  var MAX_VISIVEIS = 4;
+  var DURACAO = 4000; // 4 SEGUNDOS
+
+  function mascarar(n){ n = String(n||''); return (n.substring(0,3) || 'Usu') + '***'; }
+  function fmtValor(v){ v = Number(v) || 0; return 'R$ ' + v.toFixed(2).replace('.',','); }
+
+  function remover(el){
+    if(!el || !el.parentNode) return;
+    el.classList.add('ns-saindo');
+    setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 260);
+  }
+
+  function addArrasto(t){
+    t.addEventListener('pointerdown', function(e){
+      if(e.target.classList.contains('ns-fechar')) return;
+      var sx = e.clientX, sy = e.clientY, dx = 0, dy = 0;
+      try{ t.setPointerCapture(e.pointerId); }catch(err){}
+      t.style.transition = 'none';
+      function move(ev){ dx = ev.clientX - sx; dy = ev.clientY - sy; t.style.transform = 'translate(' + dx + 'px,' + dy + 'px)'; }
+      function up(){
+        t.removeEventListener('pointermove', move);
+        t.removeEventListener('pointerup', up);
+        t.removeEventListener('pointercancel', up);
+        t.style.transition = 'transform .25s, opacity .25s';
+        if(Math.abs(dx) > 60 || dy < -60){
+          t.style.opacity = '0';
+          t.style.transform = 'translate(' + (dx >= 0 ? 160 : -160) + 'px,' + dy + 'px)';
+          setTimeout(function(){ remover(t); }, 260);
+        } else { t.style.transform = ''; }
+      }
+      t.addEventListener('pointermove', move);
+      t.addEventListener('pointerup', up);
+      t.addEventListener('pointercancel', up);
+    });
+  }
+
+  function exibirSaque(sq){
+    if(!box) return;
+    var t = document.createElement('div');
+    t.className = 'ns-item';
+    t.innerHTML = '<div class="ns-ico">$</div>'
+      + '<div class="ns-texto"><b>' + mascarar(sq.nome) + '</b> solicitou saque de <span class="ns-valor">' + fmtValor(sq.valor) + '</span><div class="ns-sub">Pix · aguardando liberação</div></div>'
+      + '<button class="ns-fechar" aria-label="fechar">×</button>';
+    box.appendChild(t);
+    t.querySelector('.ns-fechar').onclick = function(){ remover(t); };
+    addArrasto(t);
+    while(box.children.length > MAX_VISIVEIS){ remover(box.firstChild); }
+    setTimeout(function(){ remover(t); }, DURACAO);
+    // atualiza listas ao vivo
+    try{
+      var ts = document.getElementById('tela-sacar');
+      if(ts && !ts.classList.contains('esconder') && typeof carregarSaquesUsuario === 'function') carregarSaquesUsuario();
+      var ta = document.getElementById('tela-saques-admin');
+      if(ta && !ta.classList.contains('esconder') && typeof carregarSaquesPendentes === 'function') carregarSaquesPendentes();
+    }catch(e){}
+  }
+
+  var ultimaChave = null;
+  try {
+    db.ref('saques').once('value', function(snap){
+      snap.forEach(function(ch){ ultimaChave = ch.key; });
+      db.ref('saques').on('child_added', function(s){
+        if(ultimaChave && s.key <= ultimaChave) return;
+        ultimaChave = s.key;
+        var v = s.val();
+        if(v){ exibirSaque(v); mostrarNotifSaque(); }
+      });
+    });
+  } catch(e) {}
+
+  try {
+    var TEMPO_OFF = 5000; // 5 segundos - mesmo valor do script principal (instantâneo!)
+    db.ref('status').on('value', function(snap){
+      var c = 0; var agora = Date.now();
+      snap.forEach(function(ch){
+        var d = ch.val();
+        // ✅ Corrigido: só conta quem tá online E teve atividade recente
+        // (antes contava mesmo quem fechou o site há horas — bug resolvido!)
+        if(d && d.online === true && (agora - (Number(d.ultimaVez)||0)) < TEMPO_OFF) c++;
+      });
+      if(oc) oc.textContent = c;
+    });
+  } catch(e) {}
+
+  // ===== NOTIFICACAO DE SAQUE no bloco amarelo (4s, clicavel -> Liberar Saques) =====
+  var notifTimer = null;
+  function mostrarNotifSaque(){
+    var area = document.getElementById('saqueNotifArea');
+    var numEl = document.getElementById('saqueNotifNum');
+    if(!area || !numEl) return;
+    // conta quantos saques estao PENDENTES no momento
+    db.ref('saques').once('value', function(snap){
+      var pend = 0;
+      snap.forEach(function(s){ if((s.val()||{}).status === 'pendente') pend++; });
+      numEl.textContent = pend;
+      // reinicia animacao de entrada
+      area.classList.remove('visivel');
+      void area.offsetWidth;
+      area.classList.add('visivel');
+      // fica visivel por 4 segundos -> some sozinha
+      if(notifTimer) clearTimeout(notifTimer);
+      notifTimer = setTimeout(function(){ area.classList.remove('visivel'); }, 4000);
+    });
+  }
+  // A badge de pessoas online fica SEMPRE visivel (CSS garante), sem logica de scroll.
+  // O contador e atualizado pelo listener de 'status' acima.
+})();
+</script>
+</body>
+</html>
